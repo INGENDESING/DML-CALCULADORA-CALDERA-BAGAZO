@@ -41,7 +41,7 @@ from app.frontend.components.charts import (
     create_energy_sankey,
     create_results_comparison
 )
-from app.frontend.components.pid_diagram import create_pid_plotly, create_pid_html
+from app.frontend.components.pid_diagram import create_pid_plotly, create_pid_html, create_pid_image
 from app.frontend.components.report_generator import generate_pdf_report, is_pdf_generation_available
 from app.frontend.components.pdf_modal import create_pdf_modal
 
@@ -222,8 +222,7 @@ def update_tabs_content(active_tab, results):
         return html.Div('Esperando resultados...', style={'textAlign': 'center', 'padding': '40px', 'color': COLORS['text_secondary']})
 
     if active_tab == 'tab-pid':
-        return html.Div([html.H4('DIAGRAMA DE FLUJO DE PROCESO', style={'color': COLORS['text_primary'], 'marginBottom': '16px'}),
-                         dcc.Graph(figure=create_pid_plotly(results), style={'height': '500px'})])
+        return create_pid_image(results)
     elif active_tab == 'tab-charts':
         return html.Div([html.Div([html.Div([html.H5('Ratio vs Cenizas', style={'color': COLORS['text_primary']}),
                                                  dcc.Graph(figure=create_ratio_vs_ash_curve(results), style={'height': '300px'})],
