@@ -33,7 +33,7 @@ from base_validation import get_base_inputs, validate_complete_results
 
 # Importar componentes frontend con imports absolutos
 from app.frontend.layouts.layout_main import create_layout
-from app.frontend.components.kpi_cards import create_ratio_kpi, create_kpi_card, create_kpi_row
+from app.frontend.components.kpi_cards import create_ratio_kpi, create_kpi_card, create_kpi_row, create_results_table
 from app.frontend.components.charts import (
     create_ratio_vs_ash_curve,
     create_ratio_vs_efficiency_curve,
