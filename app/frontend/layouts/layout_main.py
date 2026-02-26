@@ -35,26 +35,44 @@ COLORS = {
 # ═══════════════════════════════════════════════════════════════════════════════
 
 def create_header() -> html.Div:
-    """Crea el encabezado de la aplicación."""
+    """Crea el encabezado de la aplicación con logos mejorados."""
     return html.Div([
         html.Div([
-            # Logo y título
+            # Logos y título
             html.Div([
-                html.I(className='fas fa-industry', style={
-                    'fontSize': '28px',
-                    'color': COLORS['accent'],
-                    'marginRight': '12px'
+                # Logo DML
+                html.Img(
+                    src='/assets/logo1.png',
+                    height='45px',
+                    style={'marginRight': '15px', 'verticalAlign': 'middle'}
+                ),
+                # Logo CASTILLA
+                html.Img(
+                    src='/assets/logo2.png',
+                    height='45px',
+                    style={'marginRight': '20px', 'verticalAlign': 'middle'}
+                ),
+                # Separador vertical
+                html.Div(style={
+                    'width': '1px',
+                    'height': '40px',
+                    'background': COLORS['border'],
+                    'marginRight': '20px'
                 }),
+                # Texto informativo
                 html.Div([
-                    html.H3('DML INGENIEROS CONSULTORES', style={
+                    html.H3('DML INGENIEROS CONSULTORES S.A.S.', style={
                         'margin': '0',
-                        'fontSize': '18px',
-                        'fontWeight': 'bold'
+                        'fontSize': '20px',
+                        'fontWeight': 'bold',
+                        'color': COLORS['text_primary'],
+                        'letterSpacing': '0.5px'
                     }),
-                    html.P('Calculadora de Caldera Acuotubular', style={
+                    html.P('Calculadora de Caldera Acuotubular con Bagazo', style={
                         'margin': '0',
-                        'fontSize': '12px',
-                        'color': COLORS['text_secondary']
+                        'fontSize': '13px',
+                        'color': COLORS['accent'],
+                        'fontWeight': '500'
                     })
                 ])
             ], style={'display': 'flex', 'alignItems': 'center'}),
@@ -71,7 +89,8 @@ def create_header() -> html.Div:
                     'borderRadius': '6px',
                     'padding': '8px 16px',
                     'marginRight': '12px',
-                    'cursor': 'pointer'
+                    'cursor': 'pointer',
+                    'fontSize': '13px'
                 }),
 
                 html.Button([
@@ -83,7 +102,8 @@ def create_header() -> html.Div:
                     'border': 'none',
                     'borderRadius': '6px',
                     'padding': '8px 16px',
-                    'cursor': 'pointer'
+                    'cursor': 'pointer',
+                    'fontSize': '13px'
                 })
             ])
         ], style={
@@ -95,8 +115,8 @@ def create_header() -> html.Div:
     ], style={
         'background': COLORS['bg_secondary'],
         'borderBottom': f"2px solid {COLORS['accent']}",
-        'padding': '12px 24px',
-        'boxShadow': '0 2px 8px rgba(0,0,0,0.3)',
+        'padding': '10px 24px',
+        'boxShadow': '0 2px 12px rgba(0,0,0,0.4)',
         'position': 'sticky',
         'top': '0',
         'zIndex': '1000'
