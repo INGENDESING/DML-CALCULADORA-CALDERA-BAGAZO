@@ -17,27 +17,33 @@ from datetime import datetime
 
 # Importar backend - agregar ruta al path
 import sys
-backend_path = os.path.join(os.path.dirname(__file__), '..', 'backend')
+# Obtener directorio raíz del proyecto (2 niveles arriba de este archivo)
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+# Agregar backend al path
+backend_path = os.path.join(project_root, 'app', 'backend')
 if backend_path not in sys.path:
-    sys.path.append(backend_path)
+    sys.path.insert(0, backend_path)
 
 from balance import calculate_complete_balance, InputData, format_results_table
 from validators import validate_inputs, get_default_values
 from base_validation import get_base_inputs, validate_complete_results
 
-# Importar componentes frontend
-from layouts.layout_main import create_layout
-from components.kpi_cards import create_ratio_kpi, create_kpi_card, create_kpi_row
-from components.charts import (
+# Importar componentes frontend con imports absolutos
+from app.frontend.layouts.layout_main import create_layout
+from app.frontend.components.kpi_cards import create_ratio_kpi, create_kpi_card, create_kpi_row
+from app.frontend.components.charts import (
     create_ratio_vs_ash_curve,
     create_ratio_vs_efficiency_curve,
     create_flue_gas_composition,
     create_energy_sankey,
     create_results_comparison
 )
-from components.pid_diagram import create_pid_plotly, create_pid_html
-from components.report_generator import generate_pdf_report, is_pdf_generation_available
-from components.pdf_modal import create_pdf_modal
+from app.frontend.components.pid_diagram import create_pid_plotly, create_pid_html
+from app.frontend.components.report_generator import generate_pdf_report, is_pdf_generation_available
+from app.frontend.components.pdf_modal import create_pdf_modal
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
