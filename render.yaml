@@ -1,0 +1,25 @@
+# ============================================================
+# render.yaml - Configuración de deployment en Render.com
+# Calculadora de Caldera Acuotubular
+# DML INGENIEROS CONSULTORES S.A.S.
+# ============================================================
+
+services:
+  # Servicio Web - Calculadora de Caldera
+  - type: web
+    name: calculadora-caldera
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+    startCommand: python run.py
+
+    # Variables de entorno (se pueden sobrescribir en el dashboard de Render)
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: PRODUCTION
+        value: true
+
+    # Configuración de health check
+    healthCheckPath: /

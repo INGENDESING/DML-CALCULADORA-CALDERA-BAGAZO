@@ -33,7 +33,7 @@ if frontend_path not in sys.path:
 
 
 def parse_arguments():
-    """Parsea argumentos de línea de comandos."""
+    """Parsea argumentos de línea de comandos y variables de entorno."""
     args = {
         'host': '127.0.0.1',
         'port': 8050,
@@ -41,6 +41,16 @@ def parse_arguments():
         'dev_tools_hot_reload': False,
         'dev_tools_prune_errors': True
     }
+
+    # Render y otras plataformas definen PORT como variable de entorno
+    if 'PORT' in os.environ:
+        args['port'] = int(os.environ['PORT'])
+        args['host'] = '0.0.0.0'  # Necesario para Render
+        args['debug'] = False     # Siempre producción en la nube
+
+    # Modo producción desde variable de entorno
+    if os.environ.get('PRODUCTION') == 'true':
+        args['debug'] = False
 
     for i, arg in enumerate(sys.argv[1:], 1):
         if arg == '--prod':
