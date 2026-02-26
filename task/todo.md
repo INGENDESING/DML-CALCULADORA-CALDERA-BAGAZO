@@ -217,3 +217,25 @@ scipy>=1.11.0
 
 ### Pendiente:
 - **FASE 7: Deployment** (GitHub, Render)
+
+---
+
+## 8. CORRECCIÓN BUG: KPI Principal Ratio Vapor/Bagazo (2026-02-26)
+
+### Problema
+El KPI principal "Ratio Vapor/Bagazo" mostraba un **valor objetivo fijo de 2.655**, una **desviación porcentual**, y un **estado de tolerancia** (verde/naranja/rojo). Esto era un error conceptual: el valor 2.655 es solo el resultado del caso base de validación, no una meta operativa. Cuando el usuario cambiaba parámetros (ej: humedad del bagazo), el KPI comparaba incorrectamente contra 2.655.
+
+### Solución
+Simplificar el KPI para que muestre únicamente el valor calculado para las condiciones actuales, sin comparación alguna.
+
+### Archivos modificados
+1. **`app/frontend/components/kpi_cards.py`** — función `create_ratio_kpi()`
+   - Eliminado: parámetro `target`, cálculo de `deviation`, lógica de colores por tolerancia, líneas de "Objetivo", "Desviación" y estado
+   - Resultado: muestra solo el valor calculado con color de acento fijo (#0078D4)
+2. **`app/frontend/app.py`** — callback `update_ratio_kpi()`
+   - Eliminado: argumento `target=2.655` en la llamada a `create_ratio_kpi()`
+
+### Verificación
+- [x] Sintaxis Python verificada en ambos archivos
+- [x] 21/21 tests de combustión pasando (tests de balance/termodinámica requieren `iapws` no disponible en entorno de CI)
+- [x] Cambio mínimo: solo 2 archivos, solo componente de display (no afecta cálculos backend)

@@ -297,7 +297,7 @@ def create_kpi_row(kpis: list, n_cols: int = 4) -> html.Div:
 # KPI PARA EL RATIO VAPOR/BAGAZO (PRINCIPAL)
 # ═══════════════════════════════════════════════════════════════════════════════
 
-def create_ratio_kpi(ratio: float, target: float = 2.655) -> html.Div:
+def create_ratio_kpi(ratio: float) -> html.Div:
     """
     Crea el KPI principal del ratio Vapor/Bagazo.
 
@@ -305,27 +305,13 @@ def create_ratio_kpi(ratio: float, target: float = 2.655) -> html.Div:
     ----------
     ratio : float
         Valor calculado del ratio
-    target : float
-        Valor objetivo
 
     Returns
     -------
     html.Div
         KPI del ratio
     """
-    # Calcular desviación
-    deviation = ((ratio - target) / target) * 100
-
-    # Color según desviación
-    if abs(deviation) <= 2:
-        color = '#107C10'  # Verde - dentro de tolerancia
-        status = "Dentro de tolerancia"
-    elif abs(deviation) <= 5:
-        color = '#FF8C00'  # Naranja - fuera de tolerancia pero aceptable
-        status = "Fuera de tolerancia"
-    else:
-        color = '#E81123'  # Rojo - revisar
-        status = "Revisar cálculos"
+    color = '#0078D4'
 
     return html.Div([
         html.Div([
@@ -348,30 +334,11 @@ def create_ratio_kpi(ratio: float, target: float = 2.655) -> html.Div:
                     'color': '#808080',
                     'marginLeft': '12px'
                 })
-            ], style={'marginBottom': '16px'}),
-            html.Div([
-                html.Span(f"Objetivo: {target:.3f}", style={
-                    'fontSize': '14px',
-                    'color': '#808080'
-                }),
-                html.Span(f" | Desviación: {deviation:+.1f}%", style={
-                    'fontSize': '14px',
-                    'color': color,
-                    'marginLeft': '16px',
-                    'fontWeight': 'bold'
-                })
-            ]),
-            html.Div(status, style={
-                'fontSize': '12px',
-                'color': color,
-                'marginTop': '8px',
-                'textTransform': 'uppercase',
-                'letterSpacing': '0.5px'
-            })
+            ])
         ], style={'textAlign': 'center'})
     ], style={
-        'background': f'linear-gradient(135deg, #2D2D30 0%, #252526 100%)',
-        'border': f"3px solid {color}",
+        'background': 'linear-gradient(135deg, #2D2D30 0%, #252526 100%)',
+        'border': f'3px solid {color}',
         'borderRadius': '16px',
         'padding': '24px',
         'boxShadow': f'0 8px 32px {color}33',

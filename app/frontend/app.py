@@ -180,7 +180,7 @@ def calculate_balance(n_clicks, m_stm, P_stm, T_stm, T_fw, pct_purge, efficiency
 def update_ratio_kpi(results):
     if not results:
         return html.Div()
-    return create_ratio_kpi(results['ratio'], target=2.655)
+    return create_ratio_kpi(results['ratio'])
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
