@@ -153,6 +153,14 @@ def calculate_balance(n_clicks, m_stm, P_stm, T_stm, T_fw, pct_purge, efficiency
             'Q_purge': results.blowdown.energy_MW, 'Q_fuel': results.Q_fuel_MW,
             'Q_abs': results.Q_abs_MW, 'losses': results.losses_MW,
             'h_steam': results.steam_props['h'],
+            'flue_gas_composition': results.flue_gas_composition,
+            'pct_purge': float(results.inputs.pct_purge),
+            'efficiency': float(results.inputs.efficiency),
+            'bagazo_humidity': float(results.inputs.bagazo_humidity),
+            'bagazo_ash': float(results.inputs.bagazo_ash),
+            'altitude': float(results.inputs.altitude),
+            'RH': float(results.inputs.RH),
+            'excess_air': float(results.inputs.excess_air),
         }
 
         success_style = {'display': 'block', 'background': f'{COLORS["success"]}20',
@@ -180,7 +188,7 @@ def calculate_balance(n_clicks, m_stm, P_stm, T_stm, T_fw, pct_purge, efficiency
 def update_ratio_kpi(results):
     if not results:
         return html.Div()
-    return create_ratio_kpi(results['ratio'], target=2.655)
+    return create_ratio_kpi(results['ratio'])
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -226,7 +234,10 @@ def update_tabs_content(active_tab, results):
                                    style={'width': '100%'}),
                          html.Hr(style={'border': f'1px solid {COLORS["border"]}', 'margin': '20px 0'}),
                          html.H5('Composición de Gases', style={'color': COLORS['text_primary']}),
-                         dcc.Graph(figure=create_flue_gas_composition({'CO2': 12, 'H2O': 14, 'N2': 70, 'O2': 3, 'SO2': 1}), style={'height': '350px'})])
+                         dcc.Graph(figure=create_flue_gas_composition(results.get('flue_gas_composition', {'CO2': 0, 'H2O': 0, 'N2': 0, 'O2': 0, 'SO2': 0})), style={'height': '350px'})])
+    elif active_tab == 'tab-table':
+        return html.Div([html.H4('TABLA DE RESULTADOS', style={'color': COLORS['text_primary'], 'marginBottom': '16px'}),
+                         create_results_table(results)])
     elif active_tab == 'tab-sankey':
         return html.Div([html.H4('BALANCE DE ENERGÍA', style={'color': COLORS['text_primary'], 'marginBottom': '16px'}),
                          dcc.Graph(figure=create_energy_sankey({'Q_fw': results['Q_fw'], 'Q_fuel': results['Q_fuel'],
