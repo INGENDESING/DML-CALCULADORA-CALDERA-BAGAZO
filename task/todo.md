@@ -239,3 +239,37 @@ Simplificar el KPI para que muestre únicamente el valor calculado para las cond
 - [x] Sintaxis Python verificada en ambos archivos
 - [x] 21/21 tests de combustión pasando (tests de balance/termodinámica requieren `iapws` no disponible en entorno de CI)
 - [x] Cambio mínimo: solo 2 archivos, solo componente de display (no afecta cálculos backend)
+
+---
+
+## 9. CORRECCIONES MÚLTIPLES (2026-02-26)
+
+### Problema 1: Diagrama P&ID/PFD deficiente
+**Archivo:** `app/frontend/components/pid_diagram.py` — función `create_pid_plotly()`
+- Reescrita completamente con diagrama esquemático profesional de caldera acuotubular
+- Componentes dibujados: Domo superior, domo inferior, banco de tubos, hogar/zona de combustión, sobrecalentador (serpentín), chimenea
+- 7 corrientes con tuberías y flechas direccionales: agua alimentación, bagazo, aire, vapor sobrecalentado, purga, gases de combustión, cenizas
+- Etiquetas dinámicas posicionadas fuera del diagrama sin superposición
+- Canvas 620px, caldera centrada, fondo oscuro consistente con tema
+
+### Problema 2: Botón "GENERAR REPORTE PDF" no genera nada
+**Archivo:** `app/frontend/app.py` — callback `calculate_balance()`
+- Agregados 7 parámetros de entrada faltantes al `results_dict`: `pct_purge`, `efficiency`, `bagazo_humidity`, `bagazo_ash`, `altitude`, `RH`, `excess_air`
+- El callback `handle_pdf_modal` ahora puede leer los inputs reales del usuario desde `store-results`
+- Nota: `reportlab` debe estar instalado en el entorno de producción para que el PDF se genere
+
+### Problema 3: Pestaña "Tabla de Resultados" vacía
+**Archivo:** `app/frontend/app.py` — callback `update_tabs_content()`
+- Agregado caso `elif active_tab == 'tab-table':` que faltaba
+- Llama a `create_results_table(results)` que ya existía e importada pero nunca se invocaba
+
+### Problema 4: Gráfica de composición de gases ilegible
+**Archivos:** `app/frontend/components/charts.py` + `app/frontend/app.py`
+- Cambiada de barras apiladas (`go.Bar`) a gráfica de torta/donut (`go.Pie`)
+- Agregada composición de gases (`flue_gas_composition`) al `results_dict`
+- Reemplazados datos hardcodeados por datos dinámicos del balance
+
+### Verificación
+- [x] Sintaxis Python verificada en los 3 archivos modificados
+- [x] 21/21 tests de combustión pasando
+- [x] Cambios mínimos y focalizados en cada problema

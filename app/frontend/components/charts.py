@@ -230,7 +230,7 @@ def create_ratio_vs_efficiency_curve(base_params: dict,
 
 def create_flue_gas_composition(composition: dict) -> go.Figure:
     """
-    Crea gráfico de barras apiladas con composición de gases.
+    Crea gráfico de torta con composición de gases.
 
     Parameters
     ----------
@@ -245,51 +245,18 @@ def create_flue_gas_composition(composition: dict) -> go.Figure:
     """
     components = ['CO2', 'H2O', 'N2', 'O2', 'SO2']
     values = [composition.get(c, 0) for c in components]
-
-    colors = {
-        'CO2': '#808080',    # Gris
-        'H2O': '#0078D4',    # Azul
-        'N2': '#A0A0A0',     # Gris claro
-        'O2': '#FF8C00',     # Naranja
-        'SO2': '#E81123',    # Rojo
-    }
+    pie_colors = ['#808080', '#0078D4', '#A0A0A0', '#FF8C00', '#E81123']
 
     fig = go.Figure(data=[
-        go.Bar(
-            x=['Gases de Combustión'],
-            y=[values[0]],
-            name='CO2',
-            marker_color=colors['CO2'],
-            hovertemplate='CO2: %{y:.1f}%<extra></extra>'
-        ),
-        go.Bar(
-            x=['Gases de Combustión'],
-            y=[values[1]],
-            name='H2O',
-            marker_color=colors['H2O'],
-            hovertemplate='H2O: %{y:.1f}%<extra></extra>'
-        ),
-        go.Bar(
-            x=['Gases de Combustión'],
-            y=[values[2]],
-            name='N2',
-            marker_color=colors['N2'],
-            hovertemplate='N2: %{y:.1f}%<extra></extra>'
-        ),
-        go.Bar(
-            x=['Gases de Combustión'],
-            y=[values[3]],
-            name='O2',
-            marker_color=colors['O2'],
-            hovertemplate='O2: %{y:.1f}%<extra></extra>'
-        ),
-        go.Bar(
-            x=['Gases de Combustión'],
-            y=[values[4]],
-            name='SO2',
-            marker_color=colors['SO2'],
-            hovertemplate='SO2: %{y:.1f}%<extra></extra>'
-        ),
+        go.Pie(
+            labels=components,
+            values=values,
+            marker=dict(colors=pie_colors, line=dict(color='#1E1E1E', width=2)),
+            textinfo='label+percent',
+            textfont=dict(size=13, color='#FFFFFF'),
+            hovertemplate='%{label}: %{value:.1f}%<extra></extra>',
+            hole=0.3,
+        )
     ])
 
     fig.update_layout(
@@ -297,20 +264,15 @@ def create_flue_gas_composition(composition: dict) -> go.Figure:
             text='COMPOSICIÓN DE GASES DE COMBUSTIÓN',
             font=dict(size=16, color=COLORS['text_primary'])
         ),
-        barmode='stack',
-        xaxis=dict(title_text=''),
-        yaxis=dict(
-            title_text='Composición [%]',
-            range=[0, 100]
-        ),
         template=TEMPLATE,
         height=350,
         legend=dict(
             orientation='h',
             yanchor='bottom',
-            y=1.02,
-            xanchor='right',
-            x=1
+            y=-0.1,
+            xanchor='center',
+            x=0.5,
+            font=dict(color=COLORS['text_secondary'])
         )
     )
 
