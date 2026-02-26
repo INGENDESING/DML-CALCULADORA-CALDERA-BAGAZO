@@ -537,3 +537,140 @@ def create_pid_html(results: Dict) -> html.Div:
     })
 
     return diagram
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# DIAGRAMA P&ID CON IMAGEN + ETIQUETAS DINÁMICAS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def _stream_label(title, rows, color):
+    """Crea una etiqueta de corriente compacta."""
+    children = [html.Div(title, style={
+        'fontWeight': 'bold', 'fontSize': '11px',
+        'textTransform': 'uppercase', 'marginBottom': '4px', 'color': color
+    })]
+    for row in rows:
+        children.append(html.Div(row, style={'fontSize': '10px', 'margin': '1px 0'}))
+    return children
+
+
+def create_pid_image(results: Dict) -> html.Div:
+    """
+    Crea diagrama PFD usando imagen1.png con etiquetas dinámicas superpuestas.
+
+    Parameters
+    ----------
+    results : dict
+        Resultados del balance
+
+    Returns
+    -------
+    html.Div
+        Componente HTML con imagen + etiquetas posicionadas
+    """
+    # Estilo base para etiquetas
+    label_base = {
+        'position': 'absolute',
+        'background': 'rgba(30, 30, 30, 0.92)',
+        'border': '2px solid',
+        'borderRadius': '6px',
+        'padding': '6px 10px',
+        'fontFamily': 'Consolas, monospace',
+        'color': '#FFFFFF',
+        'fontSize': '10px',
+        'zIndex': '10',
+        'whiteSpace': 'nowrap',
+    }
+
+    # ── ENTRADAS (izquierda) ─────────────────────────────────────────
+
+    # Agua de alimentación (abajo izquierda, junto a la flecha azul)
+    lbl_fw = html.Div(
+        _stream_label('AGUA DE ALIMENTACIÓN', [
+            f"Flujo: {results.get('m_fw', '-')} t/h",
+            f"Temp: {results.get('T_fw', '-')} °C",
+            f"E: {results.get('Q_fw', '-')} MW",
+        ], COLORS['stream_water']),
+        style={**label_base, 'borderColor': COLORS['stream_water'],
+               'bottom': '8%', 'left': '1%'})
+
+    # Bagazo (arriba izquierda)
+    lbl_bag = html.Div(
+        _stream_label('BAGAZO (AR)', [
+            f"Flujo: {results.get('m_bagazo', '-')} t/h",
+            f"Temp: {results.get('T_amb', '-')} °C",
+            f"E: {results.get('Q_fuel', '-')} MW",
+        ], COLORS['stream_fuel']),
+        style={**label_base, 'borderColor': COLORS['stream_fuel'],
+               'top': '18%', 'left': '1%'})
+
+    # Aire de combustión (medio izquierda)
+    lbl_air = html.Div(
+        _stream_label('AIRE DE COMBUSTIÓN', [
+            f"Flujo: {results.get('m_air', '-')} t/h",
+            f"Temp: {results.get('T_amb', '-')} °C",
+        ], COLORS['stream_air']),
+        style={**label_base, 'borderColor': COLORS['stream_air'],
+               'top': '48%', 'left': '1%'})
+
+    # ── SALIDAS (derecha) ────────────────────────────────────────────
+
+    # Vapor sobrecalentado (arriba derecha)
+    lbl_stm = html.Div(
+        _stream_label('VAPOR SOBRECALENTADO', [
+            f"Flujo: {results.get('m_stm', '-')} t/h",
+            f"Temp: {results.get('T_stm', '-')} °C",
+            f"Pres: {results.get('P_stm', '-')} barg",
+            f"h: {results.get('h_steam', '-')} kJ/kg",
+            f"E: {results.get('Q_steam', '-')} MW",
+        ], COLORS['stream_steam']),
+        style={**label_base, 'borderColor': COLORS['stream_steam'],
+               'top': '18%', 'right': '1%'})
+
+    # Purga continua (medio derecha)
+    lbl_pur = html.Div(
+        _stream_label('PURGA CONTINUA', [
+            f"Flujo: {results.get('m_purge', '-')} t/h",
+            f"Temp: {results.get('T_purge', '-')} °C",
+            f"E: {results.get('Q_purge', '-')} MW",
+        ], COLORS['stream_water']),
+        style={**label_base, 'borderColor': COLORS['stream_water'],
+               'top': '55%', 'right': '1%'})
+
+    # Gases de combustión (arriba centro)
+    lbl_gas = html.Div(
+        _stream_label('GASES DE COMBUSTIÓN', [
+            f"Flujo: {results.get('m_flue', '-')} t/h",
+            f"Temp: {results.get('T_flue', '-')} °C",
+        ], COLORS['stream_flue']),
+        style={**label_base, 'borderColor': COLORS['stream_flue'],
+               'top': '1%', 'left': '35%'})
+
+    # Cenizas (abajo derecha)
+    lbl_ash = html.Div(
+        _stream_label('CENIZAS Y RESIDUOS', [], '#8B7355'),
+        style={**label_base, 'borderColor': '#8B7355',
+               'bottom': '3%', 'right': '30%'})
+
+    return html.Div([
+        # Título
+        html.H4('DIAGRAMA DE FLUJO DE PROCESO (PFD) — CALDERA ACUOTUBULAR',
+                 style={'color': COLORS['text_primary'], 'marginBottom': '12px',
+                        'textAlign': 'center', 'fontSize': '14px'}),
+        # Contenedor con posición relativa
+        html.Div([
+            html.Img(src='/assets/imagen1.png', style={
+                'width': '100%', 'display': 'block', 'borderRadius': '8px'}),
+            lbl_fw, lbl_bag, lbl_air,
+            lbl_stm, lbl_pur, lbl_gas, lbl_ash,
+        ], style={
+            'position': 'relative',
+            'maxWidth': '1000px',
+            'margin': '0 auto',
+        })
+    ], style={
+        'background': COLORS['bg_secondary'],
+        'border': f'1px solid {COLORS["border"]}',
+        'borderRadius': '12px',
+        'padding': '16px',
+    })
