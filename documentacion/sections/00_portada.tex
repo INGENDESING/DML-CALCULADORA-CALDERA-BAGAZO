@@ -1,0 +1,73 @@
+% ===================== PORTADA MINIMALISTA CON TABLAS ESTÉTICAS =====================
+\begin{titlepage}
+	\thispagestyle{corporativo}
+
+	\centering
+	\vspace*{1cm}
+
+	{\Large\bfseries INFORME TÉCNICO DE INGENIERÍA}
+
+	\vspace{1cm}
+	\rule{\linewidth}{0.4pt}
+
+	\vspace{0.6cm}
+	{\huge\bfseries \projecttitle}
+
+	\vspace{0.6cm}
+	\rule{\linewidth}{0.4pt}
+
+	\vspace{2cm}
+
+	% Tabla de información del proyecto
+	\begin{table}[h]
+		\raggedright
+		\begin{tabular}{@{}ll@{}}
+			\toprule
+
+			\textbf{Cliente:} & \targetcompany \\
+			\textbf{Código:}  & \documentcode  \\
+			\textbf{Fecha:}   & \docFechaLarga \\
+			\bottomrule
+		\end{tabular}
+	\end{table}
+
+	\vspace{1cm}
+
+	% Tabla de equipo de trabajo
+	\begin{table}[h]
+		\raggedright
+		\begin{tabular}{@{}ll@{}}
+			\toprule
+
+			\textbf{Ingeniero Principal:}  & \firmaAprobo  \\
+			\textbf{Especialista Técnico:} & \firmaElaboro \\
+			\textbf{Revisor Técnico:}      & \firmaReviso  \\
+			\bottomrule
+		\end{tabular}
+	\end{table}
+
+	\vfill
+
+	% Tabla de control de revisiones mejorada estéticamente
+	\vspace{1cm}
+	\begin{table}[h]
+		\centering
+		\caption*{\textbf{Control de Revisiones}}
+		\label{tab:control_revisiones}
+		\begin{tabularx}{\textwidth}{@{}llXlll@{}}
+			\toprule
+
+			\textbf{Rev.} & \textbf{Fecha}  & \textbf{Descripción} & \textbf{Elaboró} & \textbf{Revisó} & \textbf{Aprobó} \\
+			\midrule
+			0             & \fechaRevCero   & \descRevCero         & \firmaElaboro    & \firmaReviso    & \firmaAprobo    \\
+			1             & \fechaRevUno    & \descRevUno          & --               & --              & --              \\
+			2             & \fechaRevDos    & \descRevDos          & --               & --              & --              \\
+			3             & \fechaRevTres   & \descRevTres         & --               & --              & --              \\
+			4             & \fechaRevCuatro & \descRevCuatro       & --               & --              & --              \\
+			\bottomrule
+		\end{tabularx}
+	\end{table}
+
+\end{titlepage}
+
+\newpage

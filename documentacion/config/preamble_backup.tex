@@ -1,0 +1,70 @@
+% ===================== CONFIGURACIÓN DE PÁGINA MEJORADA =====================
+\usepackage[top=4.5cm, bottom=2.5cm, left=2.0cm, right=2.0cm,
+headheight=4cm, headsep=0.5cm]{geometry}
+
+% ===================== TIPOGRAFÍA Y CODIFICACIÓN =====================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-tabla]{babel}
+\usepackage{times}
+\usepackage{microtype}
+
+% ===================== ELIMINAR SANGRÍAS =====================
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+% ===================== CONFIGURACIÓN DE TÍTULOS =====================
+\usepackage{titlesec}
+\titleformat{\section}{\bfseries\fontsize{12}{14}\selectfont}{\thesection}{1em}{}
+\titleformat{\subsection}{\bfseries\fontsize{12}{14}\selectfont}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}{\bfseries\fontsize{12}{14}\selectfont}{\thesubsubsection}{1em}{}
+
+% ===================== PAQUETES MATEMÁTICOS =====================
+\usepackage{amsmath,amssymb,amsfonts,mathtools}
+\usepackage{textgreek,gensymb,siunitx}
+
+% ===================== QUÍMICA Y SÍMBOLOS =====================
+\usepackage[version=4]{mhchem}
+\usepackage{chemfig,textcomp}
+
+% ===================== TABLAS Y FIGURAS =====================
+\usepackage{booktabs,array,longtable,multirow}
+\usepackage{graphicx,float,subcaption}
+\usepackage{tabularx}
+
+% ===================== SOPORTE PARA SVG =====================
+\usepackage{svg}
+
+% ===================== ENLACES E HIPERVÍNCULOS =====================
+\usepackage[hidelinks,colorlinks=true,linkcolor=blue,citecolor=blue]{hyperref}
+\usepackage{url}
+
+% ===================== OTROS PAQUETES =====================
+\usepackage{enumitem,xcolor,listings,algorithm,algpseudocode}
+\usepackage{tocloft}
+\usepackage{appendix}
+
+% ===================== PAQUETES ADICIONALES PARA TABLAS ESTÉTICAS =====================
+\usepackage{array}
+\usepackage{colortbl}
+\usepackage{multirow}
+\usepackage{booktabs}
+
+% ===================== CONFIGURACIÓN DEL ENCABEZADO =====================
+\usepackage{fancyhdr}
+
+% ===================== INFORMACIÓN DEL DOCUMENTO =====================
+\newcommand{\documentcode}{P25XX-PR-INF-00X}
+\newcommand{\targetcompany}{Empresa Cliente}
+\newcommand{\projecttitle}{Análisis Técnico de Sistema de Ingeniería}
+
+% ===================== CONFIGURACIÓN DE LISTINGS =====================
+\lstset{
+	basicstyle=\footnotesize\ttfamily,
+	breaklines=true,
+	frame=single,
+	language=Python,
+	showstringspaces=false
+}
+
+\journal{Revista de Ingeniería}

@@ -1,0 +1,1764 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, height=1080, initial-scale=1.0">
+    <title>P2807 - Cálculo de Caldera Bagacera | DML Ingeniería</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================
+           RESET & BASE
+        ============================================ */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            font-size: 16px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #0A1628;
+            color: #F8FAFC;
+            line-height: 1.5;
+        }
+
+        /* ============================================
+           CSS VARIABLES
+        ============================================ */
+        :root {
+            /* Colors */
+            --primary: #0D47A1;
+            --primary-light: #1565C0;
+            --secondary: #64B5F6;
+            --accent: #FF9800;
+            --accent-light: #FFB74D;
+            --success: #4CAF50;
+            --danger: #F44336;
+
+            /* Backgrounds */
+            --bg: #0A1628;
+            --surface: #1E293B;
+            --surface-light: #334155;
+
+            /* Text */
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --text-muted: #64748B;
+
+            /* Effects */
+            --shadow: 0 4px 12px rgba(0,0,0,0.4);
+            --shadow-lg: 0 12px 32px rgba(0,0,0,0.5);
+
+            /* Spacing */
+            --space-1: 4px;
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 20px;
+            --space-6: 24px;
+            --space-8: 32px;
+            --space-10: 40px;
+            --space-12: 48px;
+        }
+
+        /* ============================================
+           SLIDE CONTAINER
+        ============================================ */
+        .presentation {
+            width: 1920px;
+            margin: 0 auto;
+        }
+
+        /* ============================================
+           SLIDE BASE
+        ============================================ */
+        .slide {
+            width: 1920px;
+            height: 1080px;
+            position: relative;
+            background: linear-gradient(135deg, #0A1628 0%, #0F1F35 100%);
+            overflow: hidden;
+            page-break-after: always;
+            break-after: page;
+        }
+
+        .slide-bg {
+            position: absolute;
+            inset: 0;
+            background-image:
+                radial-gradient(ellipse 100% 50% at 50% 100%, rgba(13,71,161,0.15) 0%, transparent 50%),
+                radial-gradient(ellipse 80% 40% at 0% 0%, rgba(255,152,0,0.08) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .slide-grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(100,181,246,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(100,181,246,0.03) 1px, transparent 1px);
+            background-size: 80px 80px;
+            pointer-events: none;
+        }
+
+        .slide-inner {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ============================================
+           HEADER
+        ============================================ */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-8) var(--space-12);
+            border-bottom: 1px solid rgba(100,181,246,0.15);
+            background: rgba(10,22,40,0.9);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-8);
+        }
+
+        .logo {
+            width: 160px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            border-radius: var(--space-2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: 0.05em;
+        }
+
+        .header-title {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-title h1 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .header-code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--secondary);
+            background: rgba(100,181,246,0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-top: 2px;
+        }
+
+        .page-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            background: rgba(100,181,246,0.05);
+            padding: 6px 12px;
+            border-radius: 20px;
+        }
+
+        /* ============================================
+           BODY
+        ============================================ */
+        .body {
+            flex: 1;
+            padding: var(--space-12);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ============================================
+           TYPOGRAPHY
+        ============================================ */
+        h1, h2, h3, h4 {
+            font-weight: 700;
+            line-height: 1.2;
+            color: var(--text-primary);
+        }
+
+        h1 { font-size: 3rem; }
+        h2 { font-size: 2rem; margin-bottom: var(--space-4); }
+        h3 { font-size: 1.5rem; margin-bottom: var(--space-3); }
+        h4 { font-size: 1.125rem; margin-bottom: var(--space-2); }
+
+        p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: var(--space-3);
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* ============================================
+           GRIDS
+        ============================================ */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-8);
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-8);
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-6);
+        }
+
+        /* ============================================
+           CARDS
+        ============================================ */
+        .card {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: var(--space-6);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(100,181,246,0.1);
+        }
+
+        .card-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: var(--space-2);
+        }
+
+        .card-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .card-unit {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-top: var(--space-1);
+        }
+
+        /* ============================================
+           KPI CARDS
+        ============================================ */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-6);
+            margin: var(--space-8) 0;
+        }
+
+        .kpi {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: var(--space-8) var(--space-5);
+            text-align: center;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(100,181,246,0.15);
+            position: relative;
+        }
+
+        .kpi::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 16px 16px 0 0;
+        }
+
+        .kpi.accent::before {
+            background: linear-gradient(90deg, var(--accent) 0%, var(--accent-light) 100%);
+        }
+
+        .kpi.success::before {
+            background: linear-gradient(90deg, var(--success) 0%, #81C784 100%);
+        }
+
+        .kpi-icon {
+            font-size: 2rem;
+            margin-bottom: var(--space-3);
+        }
+
+        .kpi-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .kpi-unit {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .kpi-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: var(--space-2);
+        }
+
+        /* ============================================
+           HERO KPI (Large Display)
+        ============================================ */
+        .hero-kpi {
+            background: linear-gradient(135deg, rgba(13,71,161,0.2) 0%, rgba(255,152,0,0.1) 100%);
+            border-radius: 20px;
+            border: 2px solid rgba(255,152,0,0.3);
+            padding: var(--space-12);
+            text-align: center;
+            margin: var(--space-8) 0;
+        }
+
+        .hero-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 6rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 50%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+        }
+
+        .hero-unit {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-top: var(--space-3);
+        }
+
+        .hero-label {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: var(--space-2);
+        }
+
+        /* ============================================
+           DATA TABLES
+        ============================================ */
+        .table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: var(--surface);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .table thead {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+        }
+
+        .table th {
+            padding: var(--space-4) var(--space-5);
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .table td {
+            padding: var(--space-4) var(--space-5);
+            font-size: 0.9375rem;
+            color: var(--text-secondary);
+            border-bottom: 1px solid rgba(100,181,246,0.08);
+        }
+
+        .table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table tr.highlight td {
+            background: rgba(255,152,0,0.08);
+            color: var(--text-primary);
+        }
+
+        .table .mono {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* ============================================
+           BADGES
+        ============================================ */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-primary {
+            background: rgba(13,71,161,0.2);
+            color: var(--secondary);
+            border: 1px solid rgba(13,71,161,0.3);
+        }
+
+        .badge-accent {
+            background: rgba(255,152,0,0.2);
+            color: var(--accent);
+            border: 1px solid rgba(255,152,0,0.3);
+        }
+
+        .badge-success {
+            background: rgba(76,175,80,0.2);
+            color: var(--success);
+            border: 1px solid rgba(76,175,80,0.3);
+        }
+
+        /* ============================================
+           LISTS
+        ============================================ */
+        .list {
+            list-style: none;
+        }
+
+        .list-item {
+            display: flex;
+            gap: var(--space-4);
+            padding: var(--space-4) 0;
+            border-bottom: 1px solid rgba(100,181,246,0.1);
+        }
+
+        .list-item:last-child {
+            border-bottom: none;
+        }
+
+        .list-check {
+            width: 24px;
+            height: 24px;
+            min-width: 24px;
+            background: linear-gradient(135deg, var(--success) 0%, #81C784 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .list-item p {
+            margin: 0;
+        }
+
+        /* ============================================
+           FORMULA BOX
+        ============================================ */
+        .formula {
+            background: rgba(13,71,161,0.1);
+            border: 2px solid rgba(13,71,161,0.3);
+            border-radius: 12px;
+            padding: var(--space-5) var(--space-6);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            text-align: center;
+            color: var(--text-primary);
+            margin: var(--space-5) 0;
+        }
+
+        .formula.accent {
+            background: rgba(255,152,0,0.1);
+            border-color: rgba(255,152,0,0.3);
+        }
+
+        /* ============================================
+           CHARTS
+        ============================================ */
+        .bar-chart {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-5);
+            padding: var(--space-5);
+        }
+
+        .bar-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+        }
+
+        .bar-label {
+            min-width: 140px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.9375rem;
+        }
+
+        .bar-track {
+            flex: 1;
+            height: 36px;
+            background: var(--surface-light);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: var(--space-4);
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: white;
+        }
+
+        .bar-fill.danger {
+            background: linear-gradient(90deg, #F44336 0%, #EF5350 100%);
+        }
+
+        .bar-fill.primary {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+
+        .bar-fill.neutral {
+            background: linear-gradient(90deg, var(--surface-light) 0%, var(--text-muted) 100%);
+        }
+
+        /* ============================================
+           DONUT CHART
+        ============================================ */
+        .donut-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: var(--space-6);
+        }
+
+        .donut {
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            background: conic-gradient(
+                #2196F3 0deg 172.8deg,
+                #FF9800 172.8deg 208.8deg,
+                #4CAF50 208.8deg 360deg
+            );
+            position: relative;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .donut-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 140px;
+            height: 140px;
+            background: var(--surface);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .donut-legend {
+            display: flex;
+            gap: var(--space-6);
+            margin-top: var(--space-6);
+        }
+
+        .donut-legend-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            font-size: 0.875rem;
+        }
+
+        .donut-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+
+        /* ============================================
+           FLOWCHART
+        ============================================ */
+        .flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-4);
+            padding: var(--space-10);
+        }
+
+        .flow-node {
+            background: var(--surface);
+            border: 2px solid rgba(100,181,246,0.3);
+            border-radius: 12px;
+            padding: var(--space-4) var(--space-6);
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .flow-node.highlight {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            border-color: var(--primary);
+        }
+
+        .flow-arrow {
+            width: 50px;
+            height: 2px;
+            background: var(--surface-light);
+            position: relative;
+        }
+
+        .flow-arrow::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            border-left: 8px solid var(--surface-light);
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+        }
+
+        /* ============================================
+           INFO CARDS
+        ============================================ */
+        .info-card {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: var(--space-6);
+            border-left: 4px solid var(--primary);
+            box-shadow: var(--shadow);
+        }
+
+        .info-card.accent {
+            border-left-color: var(--accent);
+        }
+
+        .info-card.success {
+            border-left-color: var(--success);
+        }
+
+        .info-card h4 {
+            margin-bottom: var(--space-2);
+        }
+
+        .info-card p {
+            margin: 0;
+        }
+
+        /* ============================================
+           COVER SLIDE
+        ============================================ */
+        .slide-cover .body {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: var(--space-12);
+        }
+
+        .cover-logo {
+            width: 280px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin-bottom: var(--space-10);
+            box-shadow: 0 0 40px rgba(100,181,246,0.3);
+        }
+
+        .cover-title {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: var(--space-4);
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .cover-subtitle {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-10);
+        }
+
+        .cover-info {
+            display: flex;
+            gap: var(--space-12);
+        }
+
+        .cover-item {
+            text-align: center;
+        }
+
+        .cover-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: var(--space-2);
+        }
+
+        .cover-value {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .cover-badges {
+            margin-top: var(--space-8);
+            display: flex;
+            gap: var(--space-4);
+            justify-content: center;
+        }
+
+        /* ============================================
+           CLOSING SLIDE
+        ============================================ */
+        .slide-closing .body {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: var(--space-12);
+        }
+
+        .closing-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: var(--space-10);
+        }
+
+        /* ============================================
+           UTILITY CLASSES
+        ============================================ */
+        .text-accent { color: var(--accent); }
+        .text-secondary { color: var(--secondary); }
+        .text-success { color: var(--success); }
+        .text-muted { color: var(--text-muted); }
+        .text-primary { color: var(--text-primary); }
+
+        .mb-4 { margin-bottom: var(--space-4); }
+        .mb-6 { margin-bottom: var(--space-6); }
+        .mb-8 { margin-bottom: var(--space-8); }
+        .mb-10 { margin-bottom: var(--space-10); }
+        .mb-12 { margin-bottom: var(--space-12); }
+
+        .mt-4 { margin-top: var(--space-4); }
+        .mt-6 { margin-top: var(--space-6); }
+        .mt-8 { margin-top: var(--space-8); }
+        .mt-10 { margin-top: var(--space-10); }
+
+        .flex { display: flex; }
+        .items-center { align-items: center; }
+        .justify-center { justify-content: center; }
+
+        /* ============================================
+           PRINT STYLES
+        ============================================ */
+        @media print {
+            @page {
+                size: 1920px 1080px;
+                margin: 0;
+            }
+
+            .slide {
+                page-break-after: always;
+                break-after: page;
+            }
+
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation">
+
+        <!-- SLIDE 1: PORTADA -->
+        <div class="slide slide-cover">
+            <div class="slide-bg"></div>
+            <div class="slide-grid"></div>
+            <div class="slide-inner">
+                <div class="body">
+                    <div class="cover-logo">DML INGENIERÍA</div>
+                    <h1 class="cover-title">CÁLCULO DE CALDERA BAGACERA</h1>
+                    <p class="cover-subtitle">Indicador Toneladas Vapor / Toneladas Bagazo</p>
+                    <div class="cover-info">
+                        <div class="cover-item">
+                            <div class="cover-label">Código</div>
+                            <div class="cover-value mono">P2807-PR-MC-001</div>
+                        </div>
+                        <div class="cover-item">
+                            <div class="cover-label">Cliente</div>
+                            <div class="cover-value">RIOPAILA CASTILLA</div>
+                        </div>
+                        <div class="cover-item">
+                            <div class="cover-label">Fecha</div>
+                            <div class="cover-value">Febrero 2026</div>
+                        </div>
+                    </div>
+                    <div class="cover-badges">
+                        <span class="badge badge-primary">INGENIERÍA BÁSICA</span>
+                        <span class="badge badge-accent">COGENERACIÓN</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 2: RESUMEN EJECUTIVO -->
+        <div class="slide">
+            <div class="slide-bg"></div>
+            <div class="slide-grid"></div>
+            <div class="slide-inner">
+                <header class="header">
+                    <div class="header-left">
+                        <div class="logo">DML</div>
+                        <div class="header-title">
+                            <h1>Resumen Ejecutivo</h1>
+                            <span class="header-code">P2807-PR-MC-001</span>
+                        </div>
+                    </div>
+                    <div class="page-num">02 / 16</div>
+                </header>
+                <div class="body">
+                    <h2 class="mb-8">Balance de Materia y Energía</h2>
+                    <p class="mb-8">Caldera acuotubular bagacera para producir 100 t/h de vapor sobrecalentado a 106 barg y 545°C.</p>
+
+                    <div class="kpi-row">
+                        <div class="kpi">
+                            <div class="kpi-icon">💨</div>
+                            <div class="kpi-value">100</div>
+                            <div class="kpi-unit">t/h</div>
+                            <div class="kpi-label">Producción Vapor</div>
+                        </div>
+                        <div class="kpi">
+                            <div class="kpi-icon">⚡</div>
+                            <div class="kpi-value">106</div>
+                            <div class="kpi-unit">barg</div>
+                            <div class="kpi-label">Presión</div>
+                        </div>
+                        <div class="kpi">
+                            <div class="kpi-icon">🌡️</div>
+                            <div class="kpi-value">545</div>
+                            <div class="kpi-unit">°C</div>
+                            <div class="kpi-label">Temperatura</div>
+                        </div>
+                        <div class="kpi success">
+                            <div class="kpi-icon">✓</div>
+                            <div class="kpi-value">94%</div>
+                            <div class="kpi-unit">Eficiencia</div>
+                            <div class="kpi-label">Térmica</div>
+                        </div>
+                    </div>
+
+                    <div class="hero-kpi">
+                        <div class="hero-value">2.655</div>
+                        <div class="hero-unit">t vapor / t bagazo</div>
+                        <div class="hero-label">RATIO PRINCIPAL</div>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="info-card">
+                            <h4>🔥 Combustible</h4>
+                            <p>Bagazo 48% humedad, 10% cenizas (escenario conservador)</p>
+                        </div>
+                        <div class="info-card accent">
+                            <h4>📊 Consumo</h4>
+                            <div class="mono text-accent" style="font-size: 1.5rem; font-weight: 700;">37.67 t/h</div>
+                            <p class="mt-4">Bagazo requerido para 100 t/h de vapor</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 3: CONTEXTO INDUSTRIAL -->
+        <div class="slide">
+            <div class="slide-bg"></div>
+            <div class="slide-grid"></div>
+            <div class="slide-inner">
+                <header class="header">
+                    <div class="header-left">
+                        <div class="logo">DML</div>
+                        <div class="header-title">
+                            <h1>Contexto Industrial</h1>
+                            <span class="header-code">P2807-PR-MC-001</span>
+                        </div>
+                    </div>
+                    <div class="page-num">03 / 16</div>
+                </header>
+                <div class="body">
+                    <h2 class="mb-6">La Industria Azucarera Colombiana</h2>
+                    <p class="mb-10">El sector azucarero colombiano genera significativos recursos de biomasa para cogeneración.</p>
+
+                    <div class="grid-3 mb-10">
+                        <div class="card" style="text-align: center; padding: 40px;">
+                            <div class="kpi-icon text-accent" style="font-size: 2.5rem; margin-bottom: 16px;">📈</div>
+                            <div class="card-value">6-7 M</div>
+                            <div class="card-unit">ton/año</div>
+                            <div class="card-title mt-4">Bagazo Producido</div>
+                        </div>
+                        <div class="card" style="text-align: center; padding: 40px;">
+                            <div class="kpi-icon text-success" style="font-size: 2.5rem; margin-bottom: 16px;">⚡</div>
+                            <div class="card-value">5-6 M</div>
+                            <div class="card-unit">ton/año</div>
+                            <div class="card-title mt-4">Para Cogeneración</div>
+                        </div>
+                        <div class="card" style="text-align: center; padding: 40px;">
+                            <div class="kpi-icon text-secondary" style="font-size: 2.5rem; margin-bottom: 16px;">🏭</div>
+                            <div class="card-value">95%</div>
+                            <div class="card-unit">Autoabastecimiento</div>
+                            <div class="card-title mt-4">Energético</div>
+                        </div>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="info-card">
+                            <h4>🌎 Zona de Producción</h4>
+                            <p>Valle del Cauca: Principal región productora de caña de azúcar en Colombia.</p>
+                        </div>
+                        <div class="info-card success">
+                            <h4>🔄 Economía Circular</h4>
+                            <p>El bagazo se convierte en la principal fuente de energía para los ingenios.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 4: OBJETIVOS -->
+        <div class="slide">
+            <div class="slide-bg"></div>
+            <div class="slide-grid"></div>
+            <div class="slide-inner">
+                <header class="header">
+                    <div class="header-left">
+                        <div class="logo">DML</div>
+                        <div class="header-title">
+                            <h1>Objetivos del Proyecto</h1>
+                            <span class="header-code">P2807-PR-MC-001</span>
+                        </div>
+                    </div>
+                    <div class="page-num">04 / 16</div>
+                </header>
+                <div class="body">
+                    <h2 class="mb-6">Objetivo General</h2>
+                    <div class="info-card accent mb-10" style="padding: 32px; text-align: center;">
+                        <p style="font-size: 1.125rem; color: var(--text-primary); margin: 0;">
+                            Determinar la cantidad de bagazo necesario para producir <strong>100 t/h de vapor sobrecalentado</strong> a 106 barg y 545°C.
+                        </p>
+                    </div>
+
+                    <h3 class="mb-6">Objetivos Específicos</h3>
+                    <ul class="list">
+                        <li class="list-item">
+                            <div class="list-check">✓</div>
+                            <p>Caracterizar el bagazo colombiano mediante composición elemental y poder calorífico.</p>
+                        </li>
+                        <li class="list-item">
+                            <div class="list-check">✓</div>
+                            <p>Realizar el balance de materia del ciclo agua-vapor con purga del 2%.</p>
+                        </li>
+                        <li class="list-item">
+                            <div class="list-check">✓</div>
+                            <p>Calcular el balance de energía térmica y consumo de bagazo.</p>
+                        </li>
+                        <li class="list-item">
+                            <div class="list-check">✓</div>
+                            <p>Expresar el resultado como ratio t<sub>vapor</sub>/t<sub>bagazo</sub>.</p>
+                        </li>
+                        <li class="list-item">
+                            <div class="list-check">✓</div>
+                            <p>Proporcionar guía de simulación en Aspen Plus.</p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 5: BASES DE DISEÑO -->
+        <div class="slide">
+            <div class="slide-bg"></div>
+            <div class="slide-grid"></div>
+            <div class="slide-inner">
+                <header class="header">
+                    <div class="header-left">
+                        <div class="logo">DML</div>
+                        <div class="header-title">
+                            <h1>Bases de Diseño</h1>
+                            <span class="header-code">P2807-PR-MC-001</span>
+                        </div>
+                    </div>
+                    <div class="page-num">05 / 16</div>
+                </header>
+                <div class="body">
+                    <h2 class="mb-6">Especificaciones del Vapor Sobrecalentado</h2>
+                    <p class="mb-8">Condiciones de diseño para la caldera acuotubular bagacera.</p>
+
+                    <table class="table mb-8">
+                        <thead>
+                            <tr>
+                                <th>Parámetro</th>
+                                <th>Valor</th>
+                                <th>Unidad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="highlight">
+                                <td>Producción de vapor</td>
+                                <td class="mono">100</td>
+                                <td>t/h</td>
+                            </tr>
+                            <tr class="highlight">
+                                <td>Presión del vapor</td>
+                                <td class="mono">106</td>
+                                <td>barg</td>
+                            </tr>
+                            <tr class="highlight">
+                                <td>Temperatura del vapor</td>
+                                <td class="mono">545</td>
+                                <td>°C</td>
+                            </tr>
+                            <tr>
+                                <td>Temperatura agua alimentación</td>
+                                <td class="mono">270</td>
+                                <td>°C</td>
+                            </tr>
+                            <tr>
+                                <td>Purga continua</td>
+                                <td class="mono">2</td>
+                                <td>% del agua de alimentación</td>
+                            </tr>
+                            <tr>
+                                <td>Eficiencia térmica</td>
+                                <td class="mono">94</td>
+                                <td>%</td>
+                            </tr>
+                            <tr>
+                                <td>Tipo de caldera</td>
+                                <td class="mono" colspan="2">Acuotubular</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="grid-2">
+                        <div class="info-card">
+                            <h4>💧 Agua de Alimentación</h4>
+                            <p>Agua precalentada a 270°C antes del economizador.</p>
+                        </div>
+                        <div class="info-card success">
+                            <h4>🎯 Alta Presión</h4>
+                            <p>Vapor a 106 barg para máxima eficiencia en turbina.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 6: COMBUSTIBLE -->
+        <div class="slide">
+            <div class="slide-bg"></div>
+            <div class="slide-grid"></div>
+            <div class="slide-inner">
+                <header class="header">
+                    <div class="header-left">
+                        <div class="logo">DML</div>
+                        <div class="header-title">
+                            <h1>Caracterización del Combustible</h1>
+                            <span class="header-code">P2807-PR-MC-001</span>
+                        </div>
+                    </div>
+                    <div class="page-num">06 / 16</div>
+                </header>
+                <div class="body">
+                    <h2 class="mb-6">Bagazo de Caña - Composición AR</h2>
+                    <p class="mb-8">Escenario conservador de diseño</p>
+
+                    <div class="grid-2" style="gap: 60px;">
+                        <div class="donut-wrapper">
+                            <div class="donut">
+                                <div class="donut-center">
+                                    <div style="font-size: 1.75rem; font-weight: 700;">100%</div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted);">Total AR</div>
+                                </div>
+                            </div>
+                            <div class="donut-legend">
+                                <div class="donut-legend-item">
+                                    <div class="donut-color" style="background: #2196F6;"></div>
+                                    <span>Humedad (48%)</span>
+                                </div>
+                                <div class="donut-legend-item">
+                                    <div class="donut-color" style="background: #FF9800;"></div>
+                                    <span>Cenizas (10%)</span>
+                                </div>
+                                <div class="donut-legend-item">
+                                    <div class="donut-color" style="background: #4CAF50;"></div>
+                                    <span>Combustible (42%)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex" style="flex-direction: column; gap: 20px;">
+                            <div class="info-card" style="border-left-color: #2196F6;">
+                                <h4>Humedad: 48%</h4>
+                                <p>Condición estándar del tándem de molinos sin secado adicional.</p>
+                            </div>
+                            <div class="info-card accent" style="border-left-color: #FF9800;">
+                                <h4>Cenizas: 10% (AR)</h4>
+                                <p>Incluye materia extraña: tierra de cosecha mecanizada, arena.</p>
+                            </div>
+                            <div class="info-card success" style="border-left-color: #4CAF50;">
+                                <h4>PCI: 6.51 MJ/kg</h4>
+                                <p>Consistente con rangos reportados por Hugot (6.0-8.5 MJ/kg).</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 7: METODOLOGÍA -->
+        <div class="slide">
+            <div class="slide-bg"></div>
+            <div class="slide-grid"></div>
+            <div class="slide-inner">
+                <header class="header">
+                    <div class="header-left">
+                        <div class="logo">DML</div>
+                        <div class="header-title">
+                            <h1>Metodología</h1>
+                            <span class="header-code">P2807-PR-MC-001</span>
+                        </div>
+                    </div>
+                    <div class="page-num">07 / 16</div>
+                </header>
+                <div class="body">
+                    <h2 class="mb-6">Proceso de Cálculo</h2>
+                    <p class="mb-8">Metodología sistemática para determinar consumo de bagazo.</p>
+
+                    <div class="flow mb-10">
+                        <div class="flow-node">Datos<br>Entrada</div>
+                        <div class="flow-arrow"></div>
+                        <div class="flow-node highlight">IAPWS-97</div>
+                        <div class="flow-arrow"></div>
+                        <div class="flow-node">Balances</div>
+                        <div class="flow-arrow"></div>
+                        <div class="flow-node highlight">Resultados</div>
+                    </div>
+
+                    <div class="grid-2">
+                        <div>
+                            <h3 class="mb-4">Ecuaciones</h3>
+                            <div class="formula">
+                                m<sub>fw</sub> = m<sub>stm</sub> + m<sub>purge</sub><br>
+                                <small style="color: var(--text-muted);">m<sub>purge</sub> = 0.02 · m<sub>fw</sub></small>
+                            </div>
+                            <div class="formula">
+                                Q<sub>abs</sub> = Σ(m·h)<sub>out</sub> - Σ(m·h)<sub>in</sub>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="formula accent mb-4">
+                                m<sub>bagazo</sub> = Q<sub>fuel</sub> / PCI
+                            </div>
+                            <div class="info-card">
+                                <h4>📚 IAPWS-97</h4>
+                                <p>Formulaciones internacionales para propiedades termodinámicas del agua/vapor.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 8: PROPIEDADES TERMODINÁMICAS -->
+        <div class="slide">
+            <div class="slide-bg"></div>
+            <div class="slide-grid"></div>
+            <div class="slide-inner">
+                <header class="header">
+                    <div class="header-left">
+                        <div class="logo">DML</div>
+                        <div class="header-title">
+                            <h1>Propiedades Termodinámicas</h1>
+                            <span class="header-code">P2807-PR-MC-001</span>
+                        </div>
+                    </div>
+                    <div class="page-num">08 / 16</div>
+                </header>
+                <div class="body">
+                    <h2 class="mb-6">Entalpías Específicas - IAPWS-97</h2>
+                    <p class="mb-10">Propiedades calculadas para condiciones de diseño.</p>
+
+                    <div class="grid-3">
+                        <div class="card" style="text-align: center; padding: 36px;">
+                            <span class="badge badge-accent mb-4">VAPOR</span>
+                            <h4 class="mb-3">Vapor Sobrecalentado</h4>
+                            <p class="text-muted mb-4">P: 107.01 bara | T: 545°C</p>
+                            <div class="mono text-accent" style="font-size: 2.5rem; font-weight: 700;">3482.23</div>
+                            <div class="card-unit">kJ/kg</div>
+                            <div style="height: 8px; background: var(--surface-light); border-radius: 4px; margin-top: 20px;">
+                                <div style="width: 100%; height: 100%; background: var(--accent); border-radius: 4px;"></div>
+                            </div>
+                        </div>
+                        <div class="card" style="text-align: center; padding: 36px;">
+                            <span class="badge badge-primary mb-4">LÍQUIDO</span>
+                            <h4 class="mb-3">Agua de Alimentación</h4>
+                            <p class="text-muted mb-4">P: 112.01 bara | T: 270°C</p>
+                            <div class="mono text-secondary" style="font-size: 2.5rem; font-weight: 700;">1183.44</div>
+                            <div class="card-unit">kJ/kg</div>
+                            <div style="height: 8px; background: var(--surface-light); border-radius: 4px; margin-top: 20px;">
+                                <div style="width: 34%; height: 100%; background: var(--secondary); border-radius: 4px;"></div>
+                            </div>
+                        </div>
+                        <div class="card" style="text-align: center; padding: 36px;">
+                            <span class="badge badge-success mb-4">PURGA</span>
+                            <h4 class="mb-3">Agua de Purga</h4>
+                            <p class="text-muted mb-4">P: 112.01 bara | sat.</p>
+                            <div class="mono text-success" style="font-size: 2.5rem; font-weight: 700;">1458.64</div>
+                            <div class="card-unit">kJ/kg</div>
+                            <div style="height: 8px; background: var(--surface-light); border-radius: 4px; margin-top: 20px;">
+                                <div style="width: 42%; height: 100%; background: var(--success); border-radius: 4px;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card mt-8" style="text-align: center; padding: 20px;">
+                        <p style="margin: 0;">Propiedades calculadas con <strong>IAPWS-97</strong>, estándar internacional.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 9: BALANCE DE MATERIA -->
+        <div class="slide">
+            <div class="slide-bg"></div>
+            <div class="slide-grid"></div>
+            <div class="slide-inner">
+                <header class="header">
+                    <div class="header-left">
+                        <div class="logo">DML</div>
+                        <div class="header-title">
+                            <h1>Balance de Materia</h1>
+                            <span class="header-code">P2807-PR-MC-001</span>
+                        </div>
+                    </div>
+                    <div class="page-num">09 / 16</div>
+                </header>
+                <div class="body">
+                    <h2 class="mb-6">Ciclo Agua-Vapor</h2>
+                    <p class="mb-8">Balance con purga continua del 2%</p>
+
+                    <div class="flex items-center justify-center" style="gap: 40px; padding: 40px 0;">
+                        <!-- Entrada -->
+                        <div style="text-align: center;">
+                            <div class="card" style="padding: 32px 40px; border: 2px solid var(--secondary);">
+                                <span class="badge badge-primary mb-3">ENTRADA</span>
+                                <h4 class="mb-3">Agua de Alimentación</h4>
+                                <div class="mono text-secondary" style="font-size: 3rem; font-weight: 700;">102.04</div>
+                                <div class="card-unit">t/h</div>
+                            </div>
+                            <p class="text-muted mt-3" style="font-size: 0.875rem;">m<sub>fw</sub> = m<sub>stm</sub> / 0.98</p>
+                        </div>
+
+                        <!-- Arrow -->
+                        <div style="font-size: 2rem;">→</div>
+
+                        <!-- Caldera -->
+                        <div class="card accent" style="padding: 40px 50px; border: 3px solid var(--accent); text-align: center;">
+                            <div style="font-size: 2.5rem; margin-bottom: 12px;">🔥</div>
+                            <h3>CALDERA</h3>
+                            <p class="text-muted">Acuotubular</p>
+                        </div>
+
+                        <!-- Salidas -->
+                        <div style="display: flex; flex-direction: column; gap: 24px;">
+                            <div class="flex items-center" style="gap: 16px;">
+                                <span style="font-size: 1.5rem;">↗</span>
+                                <div class="card" style="padding: 20px 28px;">
+                                    <span class="badge badge-success mb-2">SALIDA</span>
+                                    <h4>Vapor</h4>
+                                    <div class="mono text-success" style="font-size: 1.5rem; font-weight: 700;">100.00 t/h</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center" style="gap: 16px;">
+                                <span style="font-size: 1.5rem;">↗</span>
+                                <div class="card" style="padding: 20px 28px;">
+                                    <span class="badge mb-2" style="background: rgba(100,116,139,0.2); color: var(--text-muted);">PURGA</span>
+                                    <h4>Purga</h4>
+                                    <div class="mono text-muted" style="font-size: 1.5rem; font-weight: 700;">2.04 t/h</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="formula mt-8">
+                        Balance: m<sub>fw</sub> = m<sub>stm</sub> + m<sub>purge</sub> → 102.04 = 100.00 + 2.04 ✓
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 10: BALANCE DE ENERGÍA -->
+        <div class="slide">
+            <div class="slide-bg"></div>
+            <div class="slide-grid"></div>
+            <div class="slide-inner">
+                <header class="header">
+                    <div class="header-left">
+                        <div class="logo">DML</div>
+                        <div class="header-title">
+                            <h1>Balance de Energía</h1>
+                            <span class="header-code">P2807-PR-MC-001</span>
+                        </div>
+                    </div>
+                    <div class="page-num">10 / 16</div>
+                </header>
+                <div class="body">
+                    <h2 class="mb-6">Distribución Energética</h2>
+                    <p class="mb-8">Balance de energía térmica del sistema</p>
+
+                    <div class="bar-chart mb-10">
+                        <div class="bar-item">
+                            <div class="bar-label">Combustible (Q<sub>fuel</sub>)</div>
+                            <div class="bar-track">
+                                <div class="bar-fill danger" style="width: 100%;">68.10 MW</div>
+                            </div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar-label">Absorbido (Q<sub>abs</sub>)</div>
+                            <div class="bar-track">
+                                <div class="bar-fill primary" style="width: 94%;">64.01 MW</div>
+                            </div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar-label">Pérdidas (6%)</div>
+                            <div class="bar-track">
+                                <div class="bar-fill neutral" style="width: 6%;">4.09 MW</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid-2">
+                        <div>
+                            <h3 class="mb-4">Cálculos</h3>
+                            <div class="formula" style="font-size: 0.875rem; text-align: left;">
+                                Q<sub>abs</sub> = 100,000×3482.23<br>
+                                &emsp;+ 2,040×1458.64<br>
+                                &emsp;- 102,040×1183.44
+                            </div>
+                            <div class="formula accent" style="font-size: 0.875rem; text-align: left;">
+                                Q<sub>fuel</sub> = Q<sub>abs</sub> / 0.94
+                            </div>
+                        </div>
+                        <div class="flex" style="flex-direction: column; gap: 16px;">
+                            <div class="info-card">
+                                <h4>🔥 Energía Combustible</h4>
+                                <div class="mono" style="font-size: 1.5rem; font-weight: 700; color: var(--danger);">68.10 MW</div>
+                            </div>
+                            <div class="info-card success">
+                                <h4>⚡ Energía Aprovechada</h4>
+                                <div class="mono" style="font-size: 1.5rem; font-weight: 700; color: var(--success);">64.01 MW</div>
+                            </div>
+                            <div class="kpi accent" style="padding: 16px;">
+                                <div class="kpi-value text-accent" style="font-size: 1.5rem;">94%</div>
+                                <div class="kpi-label">Eficiencia Térmica</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 11: KPI PRINCIPAL -->
+        <div class="slide">
+            <div class="slide-bg"></div>
+            <div class="slide-grid"></div>
+            <div class="slide-inner">
+                <header class="header">
+                    <div class="header-left">
+                        <div class="logo">DML</div>
+                        <div class="header-title">
+                            <h1>Resultado Principal</h1>
+                            <span class="header-code">P2807-PR-MC-001</span>
+                        </div>
+                    </div>
+                    <div class="page-num">11 / 16</div>
+                </header>
+                <div class="body" style="justify-content: center; align-items: center;">
+                    <div style="text-align: center; width: 100%;">
+                        <h2 class="mb-6">Ratio Vapor / Bagazo</h2>
+                        <p class="mb-10 text-secondary">Indicador principal de rendimiento</p>
+
+                        <div class="hero-kpi" style="padding: 80px;">
+                            <div class="hero-value">2.655</div>
+                            <div class="hero-unit" style="font-size: 1.75rem;">t vapor / t bagazo</div>
+                            <div class="hero-label">RATIO DE CONVERSIÓN</div>
+                        </div>
+
+                        <div class="grid-3" style="max-width: 900px; margin: 40px auto;">
+                            <div class="card" style="text-align: center;">
+                                <h4 class="mb-3">Producción</h4>
+                                <div class="mono text-secondary" style="font-size: 1.75rem; font-weight: 700;">100 t/h</div>
+                                <p class="text-muted mt-2">Vapor</p>
+                            </div>
+                            <div class="card accent" style="text-align: center;">
+                                <h4 class="mb-3">Consumo</h4>
+                                <div class="mono text-accent" style="font-size: 1.75rem; font-weight: 700;">37.67 t/h</div>
+                                <p class="text-muted mt-2">Bagazo</p>
+                            </div>
+                            <div class="card" style="text-align: center;">
+                                <h4 class="mb-3">Rango Ref.</h4>
+                                <div class="mono text-success" style="font-size: 1.75rem; font-weight: 700;">2.0-3.5</div>
+                                <p class="text-muted mt-2">Hugot</p>
+                            </div>
+                        </div>
+
+                        <div class="formula accent" style="font-size: 1.125rem; max-width: 600px; margin: 40px auto;">
+                            R = m<sub>stm</sub> / m<sub>bagazo</sub> = 100 / 37.67 = <strong>2.655</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 12: DIAGRAMA CALDERA -->
+        <div class="slide">
+            <div class="slide-bg"></div>
+            <div class="slide-grid"></div>
+            <div class="slide-inner">
+                <header class="header">
+                    <div class="header-left">
+                        <div class="logo">DML</div>
+                        <div class="header-title">
+                            <h1>Diagrama de Caldera</h1>
+                            <span class="header-code">P2807-PR-MC-001</span>
+                        </div>
+                    </div>
+                    <div class="page-num">12 / 16</div>
+                </header>
+                <div class="body">
+                    <h2 class="mb-6">Diagrama Sankey - Balance Energético</h2>
+                    <p class="mb-8">Esquema de flujo con corrientes principales</p>
+
+                    <div class="card mb-8" style="height: 500px; display: flex; align-items: center; justify-content: center;">
+                        <div style="text-align: center; padding: 60px;">
+                            <div style="font-size: 4rem; margin-bottom: 24px;">📊</div>
+                            <h3 class="mb-4">Diagrama Sankey</h3>
+                            <p class="text-muted" style="max-width: 500px; margin: 0 auto 32px;">
+                                El diagrama muestra el balance energético completo identificando equipos principales
+                                y corrientes de entrada/salida.
+                            </p>
+                            <div class="grid-3" style="gap: 24px;">
+                                <div class="card">
+                                    <span class="badge badge-accent">Q<sub>fuel</sub></span>
+                                    <div class="mono mt-2" style="font-weight: 700;">68.10 MW</div>
+                                </div>
+                                <div class="card">
+                                    <span class="badge badge-primary">Q<sub>abs</sub></span>
+                                    <div class="mono mt-2" style="font-weight: 700;">64.01 MW</div>
+                                </div>
+                                <div class="card">
+                                    <span class="badge badge-success">η</span>
+                                    <div class="mono mt-2" style="font-weight: 700;">94%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid-4">
+                        <div class="card" style="padding: 16px; text-align: center;">
+                            <h5 style="margin-bottom: 6px;">Hogar</h5>
+                            <p style="font-size: 0.8125rem; margin: 0;">Combustión</p>
+                        </div>
+                        <div class="card" style="padding: 16px; text-align: center;">
+                            <h5 style="margin-bottom: 6px;">Domo</h5>
+                            <p style="font-size: 0.8125rem; margin: 0;">Separación</p>
+                        </div>
+                        <div class="card" style="padding: 16px; text-align: center;">
+                            <h5 style="margin-bottom: 6px;">Sobrecalentador</h5>
+                            <p style="font-size: 0.8125rem; margin: 0;">Eleva T°</p>
+                        </div>
+                        <div class="card" style="padding: 16px; text-align: center;">
+                            <h5 style="margin-bottom: 6px;">Economizador</h5>
+                            <p style="font-size: 0.8125rem; margin: 0;">Precalienta</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 13: ANÁLISIS -->
+        <div class="slide">
+            <div class="slide-bg"></div>
+            <div class="slide-grid"></div>
+            <div class="slide-inner">
+                <header class="header">
+                    <div class="header-left">
+                        <div class="logo">DML</div>
+                        <div class="header-title">
+                            <h1>Análisis de Resultados</h1>
+                            <span class="header-code">P2807-PR-MC-001</span>
+                        </div>
+                    </div>
+                    <div class="page-num">13 / 16</div>
+                </header>
+                <div class="body">
+                    <h2 class="mb-8">Discusión Técnica</h2>
+
+                    <ul class="list">
+                        <li class="list-item">
+                            <div class="list-check">📊</div>
+                            <div>
+                                <h4 class="mb-2">Ratio en Contexto Industrial</h4>
+                                <p>El <strong>2.655 t<sub>vapor</sub>/t<sub>bagazo</sub></strong> se ubica en el rango bajo-medio (2.0-3.5), coherente con alta humedad y alto contenido mineral.</p>
+                            </div>
+                        </li>
+                        <li class="list-item">
+                            <div class="list-check">💧</div>
+                            <div>
+                                <h4 class="mb-2">Efecto de la Humedad (48%)</h4>
+                                <p>Condición estándar del tándem de molinos. Casi la mitad de la masa es agua que debe evaporarse antes de la combustión.</p>
+                            </div>
+                        </li>
+                        <li class="list-item">
+                            <div class="list-check">🏔️</div>
+                            <div>
+                                <h4 class="mb-2">Impacto de Cenizas (10% AR)</h4>
+                                <p>Incluye materia extraña mineral: tierra de cosecha mecanizada, arena. Factor conservador para diseño.</p>
+                            </div>
+                        </li>
+                        <li class="list-item">
+                            <div class="list-check">⚖️</div>
+                            <div>
+                                <h4 class="mb-2">Fracción Combustible (42%)</h4>
+                                <p>Solo el 42% de la masa es materia orgánica combustible. El 58% restante (agua + cenizas) no contribuye energéticamente.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 14: CONCLUSIONES -->
+        <div class="slide">
+            <div class="slide-bg"></div>
+            <div class="slide-grid"></div>
+            <div class="slide-inner">
+                <header class="header">
+                    <div class="header-left">
+                        <div class="logo">DML</div>
+                        <div class="header-title">
+                            <h1>Conclusiones</h1>
+                            <span class="header-code">P2807-PR-MC-001</span>
+                        </div>
+                    </div>
+                    <div class="page-num">14 / 16</div>
+                </header>
+                <div class="body">
+                    <h2 class="mb-8">Conclusiones del Estudio</h2>
+
+                    <div class="grid-2" style="gap: 24px;">
+                        <div class="card" style="padding: 28px;">
+                            <div class="flex items-center" style="gap: 16px;">
+                                <div style="width: 44px; height: 44px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">1</div>
+                                <p style="font-size: 0.9375rem; margin: 0;">Para <strong>100 t/h vapor</strong> a 106 barg y 545°C se requieren <strong>37.67 t/h de bagazo</strong> (48% humedad, 10% cenizas).</p>
+                            </div>
+                        </div>
+
+                        <div class="card" style="padding: 28px;">
+                            <div class="flex items-center" style="gap: 16px;">
+                                <div style="width: 44px; height: 44px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">2</div>
+                                <p style="font-size: 0.9375rem; margin: 0;">Ratio de <strong>2.655 t<sub>vapor</sub>/t<sub>bagazo</sub></strong>, valor conservador para condiciones industriales exigentes.</p>
+                            </div>
+                        </div>
+
+                        <div class="card" style="padding: 28px;">
+                            <div class="flex items-center" style="gap: 16px;">
+                                <div style="width: 44px; height: 44px; background: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">3</div>
+                                <p style="font-size: 0.9375rem; margin: 0;">Las cenizas (10% AR) incluyen materia extraña de cosecha mecanizada y ausencia de lavado.</p>
+                            </div>
+                        </div>
+
+                        <div class="card" style="padding: 28px;">
+                            <div class="flex items-center" style="gap: 16px;">
+                                <div style="width: 44px; height: 44px; background: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">4</div>
+                                <p style="font-size: 0.9375rem; margin: 0;">PCI de <strong>6.51 MJ/kg</strong> consistente con Hugot (6.0-8.5 MJ/kg) para alta humedad.</p>
+                            </div>
+                        </div>
+
+                        <div class="card accent" style="padding: 28px; grid-column: span 2;">
+                            <div class="flex items-center" style="gap: 16px;">
+                                <div style="width: 44px; height: 44px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">5</div>
+                                <p style="font-size: 0.9375rem; margin: 0;">Eficiencia <strong>94%</strong> y purga <strong>2%</strong> son valores estándar con margen de seguridad adecuado.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 15: GUÍA ASPEN PLUS -->
+        <div class="slide">
+            <div class="slide-bg"></div>
+            <div class="slide-grid"></div>
+            <div class="slide-inner">
+                <header class="header">
+                    <div class="header-left">
+                        <div class="logo">DML</div>
+                        <div class="header-title">
+                            <h1>Guía Aspen Plus</h1>
+                            <span class="header-code">P2807-PR-MC-001</span>
+                        </div>
+                    </div>
+                    <div class="page-num">15 / 16</div>
+                </header>
+                <div class="body">
+                    <h2 class="mb-6">Configuración de Bloques</h2>
+                    <p class="mb-8">Procedimiento para modelar la caldera</p>
+
+                    <div class="grid-2" style="gap: 40px;">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Bloque</th>
+                                    <th>Tipo</th>
+                                    <th>Función</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="mono">Descomposición</td>
+                                    <td class="mono">RYIELD</td>
+                                    <td>Bagazo NC → elementos</td>
+                                </tr>
+                                <tr>
+                                    <td class="mono">Combustión</td>
+                                    <td class="mono">RGIBBS</td>
+                                    <td>Equilibrio combustión</td>
+                                </tr>
+                                <tr>
+                                    <td class="mono">Generación Vapor</td>
+                                    <td class="mono">HEATER</td>
+                                    <td>Agua → Vapor 545°C</td>
+                                </tr>
+                                <tr>
+                                    <td class="mono">Purga</td>
+                                    <td class="mono">FSPLIT</td>
+                                    <td>Divide 2% purga</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="flex" style="flex-direction: column; gap: 20px;">
+                            <div class="info-card">
+                                <h4 class="mb-3">Componentes</h4>
+                                <div class="flex" style="gap: 12px; flex-wrap: wrap;">
+                                    <span class="badge badge-primary">Mixed: H2O, O2, N2, CO2, C</span>
+                                    <span class="badge badge-accent">NC: BAGAZO, ASH</span>
+                                </div>
+                            </div>
+
+                            <div class="info-card accent">
+                                <h4 class="mb-3">Paquete Termodinámico</h4>
+                                <p style="margin-bottom: 8px;"><strong>Agua-vapor:</strong> STEAMNBS / STEAM-TA</p>
+                                <p style="margin: 0;"><strong>Sólidos NC:</strong> HCOALGEN + DCOALIGT</p>
+                            </div>
+
+                            <div class="formula" style="font-size: 0.875rem; text-align: left;">
+                                <strong>Eficiencia 94%:</strong> HEATER auxiliar que extrae 6% como pérdida, o Design Spec para ajustar flujo de bagazo.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 16: CIERRE -->
+        <div class="slide slide-closing">
+            <div class="slide-bg"></div>
+            <div class="slide-grid"></div>
+            <div class="slide-inner">
+                <div class="body">
+                    <div class="cover-logo" style="width: 240px; height: 80px; font-size: 1.5rem;">DML INGENIERÍA</div>
+
+                    <h1 class="closing-title">¡Gracias por su atención!</h1>
+                    <p class="text-secondary" style="font-size: 1.125rem; margin-bottom: 40px;">
+                        Cálculo de Caldera Bagacera - Indicador t<sub>vapor</sub>/t<sub>bagazo</sub>
+                    </p>
+
+                    <div class="hero-kpi" style="padding: 50px 80px;">
+                        <div class="hero-value" style="font-size: 5rem;">2.655</div>
+                        <div class="hero-unit">t vapor / t bagazo</div>
+                    </div>
+
+                    <div class="grid-3" style="max-width: 800px; margin: 40px auto;">
+                        <div class="card" style="text-align: center;">
+                            <p class="text-muted" style="font-size: 0.75rem; margin-bottom: 6px;">Documento</p>
+                            <p style="font-weight: 600; margin: 0;">P2807-PR-MC-001</p>
+                        </div>
+                        <div class="card" style="text-align: center;">
+                            <p class="text-muted" style="font-size: 0.75rem; margin-bottom: 6px;">Cliente</p>
+                            <p style="font-weight: 600; margin: 0;">RIOPAILA CASTILLA</p>
+                        </div>
+                        <div class="card" style="text-align: center;">
+                            <p class="text-muted" style="font-size: 0.75rem; margin-bottom: 6px;">Fecha</p>
+                            <p style="font-weight: 600; margin: 0;">Febrero 2026</p>
+                        </div>
+                    </div>
+
+                    <div class="flex" style="gap: 16px; margin-top: 40px;">
+                        <span class="badge badge-primary">INGENIERÍA BÁSICA</span>
+                        <span class="badge badge-accent">COGENERACIÓN</span>
+                        <span class="badge badge-success">CALDERA BAGACERA</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

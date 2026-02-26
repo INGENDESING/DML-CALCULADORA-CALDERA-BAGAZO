@@ -1,0 +1,107 @@
+# ============================================================
+# .gitignore - Calculadora de Caldera Acuotubular
+# DML INGENIEROS CONSULTORES S.A.S.
+# ============================================================
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Entorno virtual
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Jupyter
+.ipynb_checkpoints
+*.ipynb
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Dash / Flask
+instance/
+.webassets-cache
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# Archivos temporales
+*.tmp
+*.temp
+*~
+
+# Reportes generados
+*.pdf
+reporte_*.pdf
+test_report*.pdf
+production_*.png
+pdf_modal_*.png
+
+# Archivos de datos locales
+*.db
+*.sqlite
+*.sqlite3
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Backup
+*.bak
+*.backup
+*~
+
+# Archivos específicos del proyecto (descomentar según necesidad)
+# app/config/local_config.py
+
+# LaTeX compilation files
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.lot
+*.lof
+*.out
+*.spl
+*.synctex.gz
+*.toc
+indent.log

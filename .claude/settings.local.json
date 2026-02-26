@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ren:*)",
+      "Bash(pdflatex:*)",
+      "Bash(biber:*)",
+      "Bash(python:*)",
+      "Bash(./venv/Scripts/python.exe:*)",
+      "Bash(timeout:*)",
+      "Bash(curl:*)",
+      "Bash(ping:*)",
+      "Bash(powershell -Command \"\\(Invoke-WebRequest -Uri ''http://localhost:8050'' -Method GET -TimeoutSec 2\\).StatusCode\")",
+      "Bash(tasklist:*)",
+      "Bash(findstr:*)",
+      "Bash(start http://localhost:8050)",
+      "Bash(netstat:*)"
+    ]
+  }
+}

@@ -1,0 +1,30 @@
+% ===================== METODOLOGÍA =====================
+\section{Metodología}
+
+\subsection{Propiedades Termodinámicas del Agua/Vapor}
+Las entalpías específicas del agua y vapor se obtuvieron de las formulaciones IAPWS-97 (International Association for the Properties of Water and Steam), implementadas computacionalmente mediante la librería \texttt{iapws} de Python.
+
+\subsection{Balance de Materia}
+El balance de materia en el lado agua de la caldera considera la producción neta de vapor, la purga continua del domo y el flujo total de agua de alimentación:
+\begin{equation}
+	m_{fw} = m_{stm} + m_{purge} \quad \text{donde} \quad m_{purge} = 0.02 \cdot m_{fw}
+\end{equation}
+
+\subsection{Balance de Energía}
+El calor absorbido por el fluido de trabajo se calcula como:
+\begin{equation}
+	Q_{abs} = m_{stm} \cdot h_{stm} + m_{purge} \cdot h_{purge} - m_{fw} \cdot h_{fw}
+\end{equation}
+
+El calor requerido del combustible, considerando la eficiencia de la caldera ($\eta = 94\%$):
+\begin{equation}
+	Q_{fuel} = \frac{Q_{abs}}{\eta}
+\end{equation}
+
+El consumo de bagazo se determina dividiendo la energía requerida entre el PCI:
+\begin{equation}
+	m_{bagazo} = \frac{Q_{fuel}}{PCI}
+\end{equation}
+
+\subsection{Poder Calorífico}
+Se empleó la fórmula de Boie (Ecuación~\ref{eq:boie}) para el cálculo del PCS a partir de la composición elemental, por ser una de las correlaciones más precisas para biomasas según la literatura especializada \cite{boie1953}.

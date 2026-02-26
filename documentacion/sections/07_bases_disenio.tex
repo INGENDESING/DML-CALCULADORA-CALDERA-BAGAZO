@@ -1,0 +1,86 @@
+% ===================== BASES DE DISEÑO =====================
+\section{Bases de Diseño}
+
+\subsection{Condiciones del Vapor a Producir}
+\begin{table}[H]
+	\centering
+	\caption{Especificaciones del vapor sobrecalentado de diseño}
+	\label{tab:steam_specs}
+	\begin{tabular}{@{}lcc@{}}
+		\toprule
+		\textbf{Parámetro} & \textbf{Valor} & \textbf{Unidad} \\
+		\midrule
+		Producción de vapor & 100 & t/h \\
+		Presión del vapor & 106 & barg \\
+		Temperatura del vapor & 545 & \si{\celsius} \\
+		Temperatura del agua de alimentación & 270 & \si{\celsius} \\
+		Purga continua & 2 & \% del agua de alimentación \\
+		Eficiencia térmica de caldera & 94 & \% \\
+		Tipo de caldera & \multicolumn{2}{c}{Acuotubular} \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\subsection{Caracterización del Combustible (Bagazo de Caña)}
+
+\subsubsection{Humedad del 48\%}
+Los ingenios azucareros colombianos operan típicamente con bagazo que presenta una humedad entre 46\% y 52\% en base húmeda (AR), dependiendo de la eficiencia de los molinos de extracción de jugo \cite{hugot1986}. El valor de 48\% adoptado para este estudio corresponde al rango medio operacional de un tándem de molinos con desaguado convencional, sin secado mecánico adicional.
+
+\subsubsection{Cenizas del 10\%}
+El contenido de cenizas del bagazo presenta una amplia variabilidad dependiendo de las condiciones de cosecha, transporte y manipulación previa al ingreso a caldera. Si bien el bagazo de caña \textit{limpio} en condiciones de laboratorio reporta cenizas de 1.5--4\% \cite{scielo_bagasse}, en la práctica industrial colombiana el contenido de cenizas \textit{efectivo} que ingresa a la caldera puede alcanzar valores significativamente mayores por las siguientes razones:
+
+\begin{enumerate}
+	\item \textbf{Arrastre de tierra en cosecha mecanizada:} La cosecha mecánica sin quema previa (práctica cada vez más común por razones ambientales) incorpora tierra, piedras y materia extraña al bagazo. En el departamento del Cauca y zonas con suelos arcillosos, el ``trash'' (materia extraña) puede representar entre 5\% y 15\% del peso total de la caña ingresada \cite{cenicana2023}.
+	\item \textbf{Ausencia de lavado de caña:} Muchos ingenios han eliminado el lavado de caña para reducir el consumo de agua y la pérdida de sacarosa, lo que incrementa directamente el contenido mineral en el bagazo resultante.
+	\item \textbf{Alto contenido de sílice:} Estudios realizados en la industria azucarera colombiana reportan porcentajes de SiO\textsubscript{2} de hasta 76.3\% en la ceniza del bagazo, indicando una alta contaminación por tierra silícea \cite{scielo_ceniza}.
+	\item \textbf{Condición ``como se recibe'' (AR):} El valor de 10\% de cenizas se expresa en base húmeda (AR), incluyendo la totalidad de la materia inorgánica que efectivamente ingresa al hogar de combustión y que debe ser considerada en el diseño térmico.
+\end{enumerate}
+
+Por lo tanto, el valor de 10\% de cenizas AR representa un \textbf{escenario conservador de diseño} que contempla las condiciones adversas de operación reales de la agroindustria cañera colombiana.
+
+\subsubsection{Composición Elemental}
+La composición elemental típica del bagazo base seca libre de cenizas (DAF -- Dry Ash Free) ha sido ampliamente documentada en la literatura \cite{hugot1986, scielo_bagasse}:
+
+\begin{table}[H]
+	\centering
+	\caption{Análisis elemental del bagazo -- base DAF y conversión a AR}
+	\label{tab:ultimate_analysis}
+	\begin{tabular}{@{}lccc@{}}
+		\toprule
+		\textbf{Componente} & \textbf{DAF (\%)} & \textbf{Factor} & \textbf{AR (\%)} \\
+		\midrule
+		Carbono (C) & 47.0 & $\times 0.42$ & 19.74 \\
+		Hidrógeno (H) & 6.0 & $\times 0.42$ & 2.52 \\
+		Oxígeno (O) & 46.5 & $\times 0.42$ & 19.53 \\
+		Nitrógeno (N) & 0.4 & $\times 0.42$ & 0.17 \\
+		Azufre (S) & 0.1 & $\times 0.42$ & 0.04 \\
+		\midrule
+		Cenizas & -- & -- & 10.00 \\
+		Humedad & -- & -- & 48.00 \\
+		\midrule
+		\textbf{Total} & \textbf{100.0} & & \textbf{100.00} \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+Donde el factor de conversión DAF$\rightarrow$AR es la fracción de materia combustible seca:
+\begin{equation}
+	f_{combustible} = 1 - W - A_{AR} = 1 - 0.48 - 0.10 = 0.42 \quad (42\%)
+\end{equation}
+
+\subsection{Poder Calorífico del Bagazo}
+
+El Poder Calorífico Superior (PCS) del bagazo se estima a partir del valor reconocido para la materia orgánica seca de la caña de azúcar ($\sim$19{,}605~kJ/kg), escalado por la fracción combustible presente \cite{hugot1986}:
+\begin{equation}
+	PCS_{AR} = 19605 \times f_{combustible} = 19605 \times 0.42 = 8234 \text{ kJ/kg} \quad (8.23 \text{ MJ/kg})
+\end{equation}
+
+El Poder Calorífico Inferior (PCI), descontando la energía de vaporización del agua total (humedad + agua de formación por combustión del hidrógeno, $\lambda_v = 2442$~kJ/kg):
+\begin{equation}
+	PCI = PCS_{AR} - 2442 \left( W + 9 \times H_{AR} \right)
+\end{equation}
+\begin{equation}
+	PCI = 8234 - 2442(0.48 + 9 \times 0.0252) = 6508 \text{ kJ/kg} \quad (6.51 \text{ MJ/kg})
+\end{equation}
+
+Este PCI de 6.51~MJ/kg es consistente con los valores reportados por la literatura para bagazo de alta humedad. A modo de referencia, Hugot \cite{hugot1986} reporta PCI entre 6.0 y 8.5~MJ/kg para humedades entre 45\% y 55\%.

@@ -1,0 +1,21 @@
+# ============================================================
+# CALCULADORA DE CALDERA ACUOTUBULAR
+# DML INGENIEROS CONSULTORES S.A.S.
+# Dependencias del Proyecto
+# ============================================================
+
+# Framework Web
+dash>=2.18.0
+dash-bootstrap-components>=1.6.0
+
+# Gráficos
+plotly>=6.0.0
+
+# Termodinámica - Propiedades del agua/vapor (IAPWS-97)
+iapws>=1.5.0
+
+# Generación de PDF
+reportlab>=4.2.0
+
+# Utilidades
+python-dateutil>=2.9.0

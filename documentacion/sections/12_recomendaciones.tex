@@ -1,0 +1,41 @@
+% ===================== RECOMENDACIONES: GUÍA DE SIMULACIÓN EN ASPEN PLUS =====================
+\section{Recomendaciones: Guía de Simulación en Aspen Plus}
+
+A continuación se detalla el procedimiento paso a paso para modelar esta caldera bagacera en \textbf{Aspen Plus}.
+
+\subsection{Paso 1: Definición de Propiedades}
+\begin{enumerate}
+	\item \textbf{Componentes convencionales:} Añadir \texttt{WATER}, \texttt{O2}, \texttt{N2}, \texttt{CO2}, \texttt{H2}, \texttt{SO2}, \texttt{C} (sólido) como componentes Mixed.
+	\item \textbf{Componentes no convencionales:} Definir \texttt{BAGAZO} como tipo NC (Non-Conventional) y \texttt{ASH} como pseudo-componente sólido NC.
+	\item \textbf{Paquete termodinámico:}
+	\begin{itemize}
+		\item Ciclo agua-vapor: \texttt{STEAMNBS} o \texttt{STEAM-TA}.
+		\item Sólidos NC: En \textit{NC Props}, seleccionar \texttt{HCOALGEN} para entalpía y \texttt{DCOALIGT} para densidad.
+	\end{itemize}
+\end{enumerate}
+
+\subsection{Paso 2: Especificación del Bagazo}
+\begin{enumerate}
+	\item En \textit{Properties $\rightarrow$ Component Attributes}, introducir:
+	\begin{itemize}
+		\item \textbf{Proximate Analysis} (AR): Humedad = 48\%, Ceniza = 1.3\%, Volátiles y Carbono Fijo ajustados.
+		\item \textbf{Ultimate Analysis} (BS): C = 49.27\%, H = 5.67\%, O = 42.31\%, N = 0.20\%, S = 0.05\%, Ceniza = 2.50\%.
+	\end{itemize}
+	\item Definir la corriente de entrada de bagazo como 29{,}954 kg/h a 25$^{\circ}$C y 1 atm, tipo MIXED + NC.
+\end{enumerate}
+
+\subsection{Paso 3: Layout de Simulación}
+\begin{enumerate}
+	\item \textbf{Bloque RYIELD (Descomposición):} Conectar la corriente de BAGAZO a un reactor \texttt{RYield}. Este bloque descompone el sólido no-convencional en sus elementos convencionales (C, H$_2$, O$_2$, N$_2$, S, H$_2$O, ceniza) según la composición elemental ingresada.
+	\item \textbf{Bloque RGIBBS (Combustión):} Los productos del \texttt{RYield} se mezclan con una corriente de AIRE (exceso de 20-30\%). El \texttt{RGibbs} calcula el equilibrio termodinámico de la combustión.
+	\item \textbf{Bloque HEATER (Generación de vapor):} Corriente AGUA-AL de 102.04 t/h a 270$^{\circ}$C. Fijar salida a 107.01 bara y 545$^{\circ}$C.
+	\item \textbf{Bloque FSPLIT (Purga):} Divisor estático que separa el 2\% de la corriente de agua antes del sobrecalentador, extrayendo 2.04 t/h como purga.
+	\item \textbf{Heat Stream:} Conectar la energía liberada por el \texttt{RGIBBS} hacia el \texttt{HEATER} mediante una corriente térmica (Heat Stream).
+\end{enumerate}
+
+\subsection{Paso 4: Ajuste de la Eficiencia del 94\%}
+\begin{enumerate}
+	\item Añadir un bloque \texttt{HEATER} auxiliar (pérdidas) en la corriente de gases calientes, que extraiga el 6\% de la energía como pérdida térmica.
+	\item Alternativamente, usar un \texttt{Design Spec} para ajustar el flujo de bagazo hasta que la potencia entregada al ciclo agua-vapor sea exactamente el 94\% de la energía química liberada.
+	\item Verificar que las temperaturas de gases de escape sean realistas (150--250$^{\circ}$C).
+\end{enumerate}

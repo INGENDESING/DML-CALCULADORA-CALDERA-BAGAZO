@@ -1,0 +1,66 @@
+% ===================== HOJA DE FIRMAS =====================
+\begin{titlepage}
+	\thispagestyle{corporativo}
+
+	\vspace*{1.5cm}
+
+	% Título del informe
+	\centering
+	{\Large\bfseries \projecttitle}
+
+	\vspace{4cm}
+
+	% ==================== DATOS EDITABLES ====================
+	% (La información ahora es dinámica y fluye desde config/datos_proyecto.tex)
+
+	% Definir columnas personalizadas
+	\newcolumntype{C}{>{\centering\arraybackslash}X}
+	\newcolumntype{G}{>{\centering\arraybackslash}p{0.28\textwidth}}
+	\newcolumntype{H}{>{\centering\arraybackslash}p{0.12\textwidth}}
+	\newcolumntype{I}{>{\centering\arraybackslash}p{0.20\textwidth}}
+
+	% Tabla 1: Control de Elaboración
+	\centering
+	\fontsize{10}{12}\selectfont
+	\renewcommand{\arraystretch}{1.3}
+	\setlength{\tabcolsep}{3pt}
+
+	\begin{tabular}{|p{0.3\textwidth}|p{0.3\textwidth}|p{0.3\textwidth}|}
+		\hline
+		\rowcolor{green!15}
+		\textbf{Elaborado por:} & \textbf{Revisado por:} & \textbf{Aprobado por:} \\
+		\hline
+		\centering\arraybackslash\rule{0pt}{1.5cm} \firmaElaboro & \centering\arraybackslash\rule{0pt}{1.5cm} \firmaReviso & \centering\arraybackslash\rule{0pt}{1.5cm} \firmaAprobo \\
+		\hline
+		\centering\arraybackslash Fecha: \fechaElaboro & \centering\arraybackslash Fecha: \fechaReviso & \centering\arraybackslash Fecha: \fechaAprobo \\
+		\hline
+	\end{tabular}
+
+	\vspace{2.5cm}
+
+	% Tabla 2: Control de Revisiones
+	\centering
+	\fontsize{10}{12}\selectfont
+	\renewcommand{\arraystretch}{1.2}
+	\setlength{\tabcolsep}{3pt}
+
+	\begin{tabular}{|c|c|p{0.3\textwidth}|c|c|c|}
+		\hline
+		\rowcolor{green!15}
+		\textbf{Versión} & \textbf{Autor} & \textbf{Descripción} & \textbf{Fecha elab.} & \textbf{Fecha rev.} & \textbf{Revisado por} \\
+		\hline
+		REV\docRevision & \firmaElaboro & \descRevCero & \fechaElaboro & \fechaReviso & \firmaReviso \\
+		\hline
+		REV1 & -- & \descRevUno & \fechaRevUno & -- & -- \\
+		\hline
+		REV2 & -- & \descRevDos & \fechaRevDos & -- & -- \\
+		\hline
+		REV3 & -- & \descRevTres & \fechaRevTres & -- & -- \\
+		\hline
+		REV4 & -- & \descRevCuatro & \fechaRevCuatro & -- & -- \\
+		\hline
+	\end{tabular}
+
+	\vfill
+
+\end{titlepage}

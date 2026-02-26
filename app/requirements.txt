@@ -1,0 +1,28 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# REQUIREMENTS - CALDERA AQUOTUBULAR DE COGENERACIÓN
+# DML INGENIEROS CONSULTORES S.A.S.
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Framework Web
+dash>=2.14.0
+dash-bootstrap-components>=1.5.0
+
+# Visualización
+plotly>=5.18.0
+
+# Termodinámica
+iapws>=1.5.0
+
+# Cálculos Numéricos
+numpy>=1.24.0
+pandas>=2.0.0
+scipy>=1.11.0
+
+# Servidor Web (para Render)
+gunicorn>=21.2.0
+
+# Reportes PDF
+reportlab>=4.0.0
+
+# Utilidades
+python-dotenv>=1.0.0

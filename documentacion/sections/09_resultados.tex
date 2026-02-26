@@ -1,0 +1,75 @@
+% ===================== RESULTADOS =====================
+\section{Resultados}
+
+\subsection{Propiedades Termodinámicas}
+Las entalpías calculadas mediante IAPWS-97 para las condiciones de diseño son:
+
+\begin{table}[H]
+	\centering
+	\caption{Entalpías específicas de las corrientes principales}
+	\label{tab:enthalpies}
+	\begin{tabular}{@{}llccc@{}}
+		\toprule
+		\textbf{Corriente} & \textbf{Estado} & \textbf{P (bara)} & \textbf{T (\si{\celsius})} & \textbf{h (kJ/kg)} \\
+		\midrule
+		Vapor sobrecalentado & Vapor & 107.01 & 545 & 3482.23 \\
+		Agua de alimentación & Líquido & 112.01 & 270 & 1183.44 \\
+		Agua de purga & Líquido saturado & 112.01 & -- & 1458.64 \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\subsection{Balance de Materia (Lado Agua)}
+\begin{equation}
+	m_{fw} = \frac{m_{stm}}{1 - 0.02} = \frac{100}{0.98} = 102.04 \text{ t/h}
+\end{equation}
+\begin{equation}
+	m_{purge} = 102.04 - 100.00 = 2.04 \text{ t/h}
+\end{equation}
+
+\subsection{Balance de Energía}
+\begin{equation}
+	Q_{abs} = 100000 \times 3482.23 + 2040 \times 1458.64 - 102040 \times 1183.44 
+\end{equation}
+\begin{equation}
+	Q_{abs} \approx 230{,}443 \text{ MJ/h} = 64.01 \text{ MW}
+\end{equation}
+
+\begin{equation}
+	Q_{fuel} = \frac{Q_{abs}}{\eta} = \frac{230{,}443}{0.94} = 245{,}153 \text{ MJ/h} = 68.10 \text{ MW}
+\end{equation}
+
+\subsection{Consumo de Bagazo}
+\begin{equation}
+	m_{bagazo} = \frac{Q_{fuel}}{PCI} = \frac{245{,}153{,}000}{6508} = 37{,}669 \text{ kg/h} = 37.67 \text{ t/h}
+\end{equation}
+
+\subsection{Ratio Principal}
+\begin{equation}
+	\boxed{R = \frac{m_{stm}}{m_{bagazo}} = \frac{100}{37.67} = \mathbf{2.655 \text{ t}_{\text{Vapor}}/\text{t}_{\text{Bagazo}}}}
+\end{equation}
+
+Este ratio de 2.655 es coherente con el rango industrial reportado de 2.0 a 3.0 para calderas bagaceras operando con bagazo de alta humedad (48\%) y alto contenido de cenizas/materia extraña (10\%) \cite{hugot1986}.
+
+\subsection{Tabla Resumen del Balance de Planta}
+
+\begin{table}[H]
+	\centering
+	\caption{Balance de materia y energía -- Base 100 t/h de vapor}
+	\label{tab:balance}
+	\begin{tabular}{@{}llcc@{}}
+		\toprule
+		\textbf{Corriente} & \textbf{Estado} & \textbf{Flujo (t/h)} & \textbf{h o PCI (kJ/kg)} \\
+		\midrule
+		\multicolumn{4}{c}{\textbf{ENTRADAS}} \\
+		Agua de alimentación & Líquido (\SI{270}{\celsius}) & 102.04 & 1183.4 \\
+		Bagazo (combustible) & Sólido (Hum. 48\%, Cen. 10\%) & 37.67 & 6508 (PCI) \\
+		Aire de combustión & Gas & \textit{Estequiom.} & -- \\
+		\midrule
+		\multicolumn{4}{c}{\textbf{SALIDAS}} \\
+		Vapor sobrecalentado & Gas (\SI{106}{barg}, \SI{545}{\celsius}) & 100.00 & 3482.2 \\
+		Agua de purga & Líquido saturado & 2.04 & 1458.6 \\
+		Gases de escape & Gas & \textit{Depende exceso} & Pérdidas (6\%) \\
+		\bottomrule
+	\end{tabular}
+\end{table}
