@@ -273,3 +273,70 @@ Simplificar el KPI para que muestre únicamente el valor calculado para las cond
 - [x] Sintaxis Python verificada en los 3 archivos modificados
 - [x] 21/21 tests de combustión pasando
 - [x] Cambios mínimos y focalizados en cada problema
+
+---
+
+## 10. CORRECCIÓN: Temperatura de Gases de Combustión (2026-02-27)
+
+### Problema
+La función `estimate_flue_gas_temperature()` en `combustion.py:329` usa la fórmula:
+```
+T_gases = T_steam - 10 + (excess_air / 5)
+```
+Caso base: T_gases = 545 - 10 + 4 = **539°C** — Valor **irreal**.
+
+En calderas bagaceras reales con economizador + precalentador de aire, la temperatura
+de gases de chimenea es **150-250°C**, no ~540°C. La fórmula actual vincula T_gases
+directamente a T_vapor, lo cual es termodinámicamente incorrecto.
+
+### Impacto
+- T_flue es **solo para visualización** (P&ID, tabla de resultados, PDF).
+- **NO afecta** el balance de energía, ratio ni consumo de bagazo (la eficiencia es input directo).
+- Cambiar la fórmula NO rompe ningún cálculo existente.
+
+### Plan de corrección
+
+- [x] **Tarea 1**: Modificar `estimate_flue_gas_temperature()` en `combustion.py`
+  - Eliminado parámetro `T_steam`, agregado `bagazo_humidity`
+  - Nueva fórmula: `T = 180 + excess_air×0.5 + (humidity-40)×0.3`
+  - Caso base: **192.4°C** ✓
+
+- [x] **Tarea 2**: Actualizar llamada en `balance.py:338`
+  - `estimate_flue_gas_temperature(inputs.excess_air, inputs.bagazo_humidity)`
+
+- [x] **Tarea 3**: Actualizar tests en `test_combustion.py`
+  - 4 tests: exceso de aire, humedad, caso base (~192°C), rango realista (150-250°C)
+
+- [x] **Tarea 4**: Verificar que tests pasen y que el ratio no se afecte
+  - **22/22 tests pasando** ✓
+  - T_gases caso base: 192.4°C ✓
+  - Ratio y balance de energía: sin cambios (T_flue es solo visualización)
+
+---
+
+## 11. CORRECCIÓN: T_gases = 125°C y energía de gases en PFD (2026-02-27)
+
+### Problema
+1. La etiqueta del PFD muestra T_gases ≈ 192°C, pero el **valor real medido es 125°C**.
+2. La corriente de gases muestra solo Flujo y Temp, pero **no muestra la energía de salida [MW]**.
+3. El flujo de aire de combustión determina la masa de gases → determina la energía que sale.
+
+### Plan de corrección
+
+- [x] **Tarea 1**: Modificar `estimate_flue_gas_temperature()` en `combustion.py`
+  - Fórmula: `T = 117 + excess_air×0.3 + (humidity-40)×0.2`
+  - Caso base: **124.6°C ≈ 125°C** ✓
+
+- [x] **Tarea 2**: Calcular energía de gases `Q_flue [MW]` en `balance.py`
+  - `Q_flue = m_flue_kgh × 1.1 × (T_flue - T_amb) / 3_600_000`
+  - Asignado a `flue_gas.energy_MW` ✓
+
+- [x] **Tarea 3**: Mostrar energía en etiqueta PFD de gases
+  - Línea `E: X.XX MW` agregada en las 3 versiones del diagrama ✓
+  - `Q_flue` agregado al `results_dict` en `app.py` ✓
+
+- [x] **Tarea 4**: Actualizar tests en `test_combustion.py`
+  - Caso base: 120-130°C, rango realista: 100-160°C ✓
+
+- [x] **Tarea 5**: Verificar tests, commit y push
+  - **22/22 tests pasando** ✓
