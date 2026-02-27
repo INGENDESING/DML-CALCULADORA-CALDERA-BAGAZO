@@ -193,11 +193,11 @@ class TestFlueGasFlow(unittest.TestCase):
 class TestFlueGasTemperature(unittest.TestCase):
     """Tests para estimación de temperatura de gases de chimenea."""
 
-    def test_temperature_increases_with_excess_air(self):
-        """Verifica que más exceso de aire eleve T_gases."""
-        T_base = estimate_flue_gas_temperature(0, 48)
-        T_excess = estimate_flue_gas_temperature(50, 48)
-        self.assertGreater(T_excess, T_base)
+    def test_temperature_decreases_with_excess_air(self):
+        """Verifica que más exceso de aire baje T_gases (más masa, misma energía)."""
+        T_low_excess = estimate_flue_gas_temperature(10, 48)
+        T_high_excess = estimate_flue_gas_temperature(50, 48)
+        self.assertGreater(T_low_excess, T_high_excess)
 
     def test_temperature_increases_with_humidity(self):
         """Verifica que más humedad del bagazo eleve T_gases."""
@@ -206,17 +206,16 @@ class TestFlueGasTemperature(unittest.TestCase):
         self.assertGreater(T_wet, T_dry)
 
     def test_temperature_base_case(self):
-        """Caso base: 20% exceso, 48% humedad → ~125°C."""
+        """Caso base: 20% exceso, 48% humedad → 125°C."""
         T_gases = estimate_flue_gas_temperature(20, 48)
-        # 117 + 6 + 1.6 = 124.6
-        self.assertGreater(T_gases, 120)
-        self.assertLess(T_gases, 130)
+        # 127.8 - 4.0 + 1.2 = 125.0
+        self.assertAlmostEqual(T_gases, 125.0, places=0)
 
     def test_temperature_in_realistic_range(self):
-        """T_gases debe estar en 100-160°C para condiciones típicas."""
+        """T_gases debe estar en 110-145°C para condiciones típicas."""
         T_gases = estimate_flue_gas_temperature(20, 48)
-        self.assertGreater(T_gases, 100)
-        self.assertLess(T_gases, 160)
+        self.assertGreater(T_gases, 110)
+        self.assertLess(T_gases, 145)
 
 
 class TestBagazoComposition(unittest.TestCase):

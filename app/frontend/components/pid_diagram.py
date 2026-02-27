@@ -324,10 +324,12 @@ def create_pid_plotly(results: Dict) -> go.Figure:
 
     # Aire (izquierda abajo)
     m_air = results.get('m_air', '-')
+    exc_air = results.get('excess_air', '-')
     _add_label(fig, 0.07, 0.14,
                ['<b>AIRE DE COMBUSTIÓN</b>',
                 f'Flujo: {m_air} t/h',
-                f'Temp: {T_amb} °C'],
+                f'Temp: {T_amb} °C',
+                f'Exc: {exc_air} %'],
                COLORS['stream_air'])
 
     # Vapor sobrecalentado (derecha arriba)
@@ -368,8 +370,10 @@ def create_pid_plotly(results: Dict) -> go.Figure:
                COLORS['stream_flue'])
 
     # Cenizas (abajo centro)
+    m_ash = results.get('m_ash', '-')
     _add_label(fig, 0.46, 0.02,
-               ['<b>CENIZAS</b>'],
+               ['<b>CENIZAS</b>',
+                f'Flujo: {m_ash} t/h'],
                '#8B7355')
 
     # ── LAYOUT ───────────────────────────────────────────────────────────
@@ -448,6 +452,7 @@ def create_pid_html(results: Dict) -> html.Div:
                 create_stream_tag('AIRE DE COMBUSTIÓN', {
                     'm': results.get('m_air', '-'),
                     'T': results.get('T_amb', '-'),
+                    'energy': 0,
                 }, 'air'),
             ], style={
                 'width': '25%',
@@ -612,6 +617,7 @@ def create_pid_image(results: Dict) -> html.Div:
         _stream_label('AIRE DE COMBUSTIÓN', [
             f"Flujo: {results.get('m_air', '-')} t/h",
             f"Temp: {results.get('T_amb', '-')} °C",
+            f"Exc: {results.get('excess_air', '-')} %",
         ], COLORS['stream_air']),
         style={**label_base, 'borderColor': COLORS['stream_air'],
                'top': '48%', 'left': '1%'})
@@ -652,7 +658,9 @@ def create_pid_image(results: Dict) -> html.Div:
 
     # Cenizas (abajo derecha)
     lbl_ash = html.Div(
-        _stream_label('CENIZAS Y RESIDUOS', [], '#8B7355'),
+        _stream_label('CENIZAS Y RESIDUOS', [
+            f"Flujo: {results.get('m_ash', '-')} t/h",
+        ], '#8B7355'),
         style={**label_base, 'borderColor': '#8B7355',
                'bottom': '3%', 'right': '30%'})
 

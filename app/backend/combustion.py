@@ -346,16 +346,16 @@ def estimate_flue_gas_temperature(excess_air: float,
     Notes
     -----
     Fórmula empírica para calderas bagaceras con economizador
-    y precalentador de aire. Rango típico: 100-160°C.
+    y precalentador de aire. Rango típico: 110-145°C.
     """
     # Temperatura base: caldera con economizador + precalentador de aire
-    T_base = 117.0
+    T_base = 127.8
 
-    # Más exceso de aire → más masa de gas → mayor temperatura de salida
-    delta_excess = excess_air * 0.3
+    # Más exceso de aire → más masa de gas → MENOR temperatura de salida
+    delta_excess = -excess_air * 0.2
 
     # Más humedad → más vapor de agua en gases → mayor temperatura
-    delta_humidity = (bagazo_humidity - 40.0) * 0.2
+    delta_humidity = (bagazo_humidity - 40.0) * 0.15
 
     return round(T_base + delta_excess + delta_humidity, 1)
 
