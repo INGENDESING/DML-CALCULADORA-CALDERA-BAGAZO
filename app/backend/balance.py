@@ -27,8 +27,7 @@ from bagazo import (
 )
 from combustion import (
     calculate_flue_gas_flow,
-    estimate_flue_gas_temperature,
-    validate_with_base_case as combustion_validate
+    estimate_flue_gas_temperature
 )
 from psychrometry import (
     calculate_air_flow_for_fuel
@@ -295,29 +294,7 @@ def calculate_complete_balance(inputs: InputData) -> BalanceResults:
     # 4. Ratio principal
     ratio = inputs.m_stm / bagazo_data['m_bagazo_th']
 
-    # 5. Aire de combustión
-    air_data = calculate_air_flow_for_fuel(
-        bagazo_data['m_bagazo_kgh'],
-        3.5,  # Aire típico por kg bagazo (se calcula después)
-        inputs.altitude,
-        inputs.T_amb,
-        inputs.RH
-    )
-
-    # Recalcular aire con el valor correcto de combustión
-    # (usar módulo de combustión para mayor precisión)
-    combustion_ref = combustion_validate()
-    air_per_kg_bagazo = combustion_ref['air_actual']
-
-    air_data = calculate_air_flow_for_fuel(
-        bagazo_data['m_bagazo_kgh'],
-        air_per_kg_bagazo,
-        inputs.altitude,
-        inputs.T_amb,
-        inputs.RH
-    )
-
-    # 6. Gases de combustión
+    # 5. Gases de combustión (antes del aire, para obtener ratio correcto)
     comp_ar_dict = {
         'C': bagazo_data['composition'].C / 100,
         'H': bagazo_data['composition'].H / 100,
@@ -334,12 +311,31 @@ def calculate_complete_balance(inputs: InputData) -> BalanceResults:
         inputs.excess_air
     )
 
+    # 6. Aire de combustión (ratio real desde combustión con excess_air del usuario)
+    air_per_kg_bagazo = flue_gas_data['combustion'].air.m_actual
+
+    air_data = calculate_air_flow_for_fuel(
+        bagazo_data['m_bagazo_kgh'],
+        air_per_kg_bagazo,
+        inputs.altitude,
+        inputs.T_amb,
+        inputs.RH
+    )
+
     # Temperatura de gases
     T_flue = estimate_flue_gas_temperature(inputs.excess_air, inputs.bagazo_humidity)
 
     # Energía de gases de salida [MW]
-    # Q_flue = m_flue [kg/h] × Cp_gas [kJ/(kg·°C)] × (T_flue - T_amb) [°C] / 3_600_000
-    Cp_gas = 1.1  # kJ/(kg·°C) promedio para gases de combustión de bagazo
+    # Cp ponderado por composición másica de gases
+    comp_wet = flue_gas_data['composition_wet']  # porcentajes másicos
+    Cp_gas = (
+        comp_wet['CO2'] * 0.846 +
+        comp_wet['H2O'] * 1.890 +
+        comp_wet['N2']  * 1.040 +
+        comp_wet['O2']  * 0.920 +
+        comp_wet['SO2'] * 0.640
+    ) / 100  # dividir por 100 porque comp_wet está en %
+
     m_flue_kgh = flue_gas_data['flows']['total_wet']
     Q_flue_MW = round(m_flue_kgh * Cp_gas * (T_flue - inputs.T_amb) / 3_600_000, 2)
 

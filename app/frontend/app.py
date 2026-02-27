@@ -146,6 +146,7 @@ def calculate_balance(n_clicks, m_stm, P_stm, T_stm, T_fw, pct_purge, efficiency
             'm_fw': float(results.feedwater.m_th), 'm_purge': float(results.blowdown.m_th),
             'm_stm': float(results.steam.m_th), 'm_bagazo': float(results.bagazo.m_th),
             'm_air': float(results.air.m_th), 'm_flue': float(results.flue_gas.m_th),
+            'm_ash': float(results.ash.m_th),
             'T_fw': results.feedwater.T_celsius, 'T_stm': results.steam.T_celsius,
             'T_purge': results.blowdown.T_celsius, 'T_flue': results.flue_gas.T_celsius,
             'P_stm': results.inputs.P_stm, 'T_amb': results.inputs.T_amb,

@@ -340,3 +340,37 @@ directamente a T_vapor, lo cual es termodinámicamente incorrecto.
 
 - [x] **Tarea 5**: Verificar tests, commit y push
   - **22/22 tests pasando** ✓
+
+---
+
+## 12. VALIDACIÓN: Balance consistente, aire dinámico, etiquetas PFD (2026-02-27)
+
+### Errores encontrados y corregidos
+
+- [x] **Fix 1**: Fórmula T_flue iba en dirección opuesta
+  - ANTES: `T = 117 + excess_air×0.3` (más aire = T más alta ❌)
+  - AHORA: `T = 127.8 - excess_air×0.2 + (humidity-40)×0.15` (más aire = T más baja ✓)
+  - Base case: `127.8 - 4.0 + 1.2 = 125.0°C` ✓
+
+- [x] **Fix 2**: Flujo de aire usaba hardcoded 20% exceso
+  - ANTES: `combustion_validate()` siempre retornaba ratio con 20% exceso ❌
+  - AHORA: `flue_gas_data['combustion'].air.m_actual` usa `inputs.excess_air` ✓
+  - Reordenado: gases se calculan ANTES del aire para obtener ratio correcto
+
+- [x] **Fix 3**: Cp_gas era constante 1.1 kJ/(kg·°C)
+  - AHORA: Cp ponderado por composición real (CO2=0.846, H2O=1.890, N2=1.040, O2=0.920, SO2=0.640)
+
+- [x] **Fix 4**: Etiquetas PFD incompletas
+  - Aire: agregado `Exc: XX%`
+  - Cenizas: agregado `Flujo: X.XX t/h`
+  - En las 3 versiones del diagrama (Plotly, HTML, Imagen)
+
+- [x] **Fix 5**: Tests actualizados
+  - `test_temperature_decreases_with_excess_air` (antes: increases)
+  - Rango realista: 110-145°C
+
+### Revisión
+- **22/22 tests pasando** ✓
+- El balance ahora responde correctamente al exceso de aire del usuario
+- Más aire → menor T_gases → menos energía perdida por chimenea
+- Todas las corrientes del PFD muestran datos completos
