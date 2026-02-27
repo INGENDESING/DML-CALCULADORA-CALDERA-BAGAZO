@@ -359,10 +359,12 @@ def create_pid_plotly(results: Dict) -> go.Figure:
     # Gases de combustión (arriba centro-derecha)
     m_flue = results.get('m_flue', '-')
     T_flue = results.get('T_flue', '-')
+    Q_flue = results.get('Q_flue', '-')
     _add_label(fig, 0.62, 0.96,
                ['<b>GASES DE COMBUSTIÓN</b>',
                 f'Flujo: {m_flue} t/h',
-                f'Temp: {T_flue} °C'],
+                f'Temp: {T_flue} °C',
+                f'E: {Q_flue} MW'],
                COLORS['stream_flue'])
 
     # Cenizas (abajo centro)
@@ -516,6 +518,7 @@ def create_pid_html(results: Dict) -> html.Div:
                 create_stream_tag('GASES DE COMB.', {
                     'm': results.get('m_flue', '-'),
                     'T': results.get('T_flue', '-'),
+                    'energy': results.get('Q_flue', '-'),
                 }, 'flue'),
             ], style={
                 'width': '25%',
@@ -642,6 +645,7 @@ def create_pid_image(results: Dict) -> html.Div:
         _stream_label('GASES DE COMBUSTIÓN', [
             f"Flujo: {results.get('m_flue', '-')} t/h",
             f"Temp: {results.get('T_flue', '-')} °C",
+            f"E: {results.get('Q_flue', '-')} MW",
         ], COLORS['stream_flue']),
         style={**label_base, 'borderColor': COLORS['stream_flue'],
                'top': '1%', 'left': '35%'})

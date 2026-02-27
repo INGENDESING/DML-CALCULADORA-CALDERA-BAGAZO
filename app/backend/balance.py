@@ -337,6 +337,12 @@ def calculate_complete_balance(inputs: InputData) -> BalanceResults:
     # Temperatura de gases
     T_flue = estimate_flue_gas_temperature(inputs.excess_air, inputs.bagazo_humidity)
 
+    # Energía de gases de salida [MW]
+    # Q_flue = m_flue [kg/h] × Cp_gas [kJ/(kg·°C)] × (T_flue - T_amb) [°C] / 3_600_000
+    Cp_gas = 1.1  # kJ/(kg·°C) promedio para gases de combustión de bagazo
+    m_flue_kgh = flue_gas_data['flows']['total_wet']
+    Q_flue_MW = round(m_flue_kgh * Cp_gas * (T_flue - inputs.T_amb) / 3_600_000, 2)
+
     # 7. Cenizas
     m_ash_th = bagazo_data['m_bagazo_th'] * (inputs.bagazo_ash / 100)
 
@@ -394,7 +400,7 @@ def calculate_complete_balance(inputs: InputData) -> BalanceResults:
         name="Gases de Combustión",
         m_th=flue_gas_data['flows']['total_wet'] / 1000,
         T_celsius=T_flue,
-        energy_MW=0,  # Pérdidas
+        energy_MW=Q_flue_MW,
         composition=flue_gas_data['composition_wet']
     )
 

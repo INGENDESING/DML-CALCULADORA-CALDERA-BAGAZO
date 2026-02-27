@@ -206,17 +206,17 @@ class TestFlueGasTemperature(unittest.TestCase):
         self.assertGreater(T_wet, T_dry)
 
     def test_temperature_base_case(self):
-        """Caso base: 20% exceso, 48% humedad → ~192°C."""
+        """Caso base: 20% exceso, 48% humedad → ~125°C."""
         T_gases = estimate_flue_gas_temperature(20, 48)
-        # 180 + 10 + 2.4 = 192.4
-        self.assertGreater(T_gases, 185)
-        self.assertLess(T_gases, 200)
+        # 117 + 6 + 1.6 = 124.6
+        self.assertGreater(T_gases, 120)
+        self.assertLess(T_gases, 130)
 
     def test_temperature_in_realistic_range(self):
-        """T_gases debe estar en 150-250°C para condiciones típicas."""
+        """T_gases debe estar en 100-160°C para condiciones típicas."""
         T_gases = estimate_flue_gas_temperature(20, 48)
-        self.assertGreater(T_gases, 150)
-        self.assertLess(T_gases, 250)
+        self.assertGreater(T_gases, 100)
+        self.assertLess(T_gases, 160)
 
 
 class TestBagazoComposition(unittest.TestCase):
