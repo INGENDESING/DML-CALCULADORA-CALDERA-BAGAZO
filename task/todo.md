@@ -273,3 +273,44 @@ Simplificar el KPI para que muestre únicamente el valor calculado para las cond
 - [x] Sintaxis Python verificada en los 3 archivos modificados
 - [x] 21/21 tests de combustión pasando
 - [x] Cambios mínimos y focalizados en cada problema
+
+---
+
+## 10. CORRECCIÓN: Temperatura de Gases de Combustión (2026-02-27)
+
+### Problema
+La función `estimate_flue_gas_temperature()` en `combustion.py:329` usa la fórmula:
+```
+T_gases = T_steam - 10 + (excess_air / 5)
+```
+Caso base: T_gases = 545 - 10 + 4 = **539°C** — Valor **irreal**.
+
+En calderas bagaceras reales con economizador + precalentador de aire, la temperatura
+de gases de chimenea es **150-250°C**, no ~540°C. La fórmula actual vincula T_gases
+directamente a T_vapor, lo cual es termodinámicamente incorrecto.
+
+### Impacto
+- T_flue es **solo para visualización** (P&ID, tabla de resultados, PDF).
+- **NO afecta** el balance de energía, ratio ni consumo de bagazo (la eficiencia es input directo).
+- Cambiar la fórmula NO rompe ningún cálculo existente.
+
+### Plan de corrección
+
+- [ ] **Tarea 1**: Modificar `estimate_flue_gas_temperature()` en `combustion.py`
+  - Nueva fórmula empírica realista para calderas bagaceras:
+    ```
+    T_base = 180°C  (caldera con economizador + precalentador de aire)
+    ΔT_exceso = excess_air × 0.5  (más aire → más masa → mayor T salida)
+    ΔT_humedad = (W - 40) × 0.3  (más humedad → más vapor de agua → mayor T)
+    T_gases = T_base + ΔT_exceso + ΔT_humedad
+    ```
+  - Caso base: T_gases = 180 + 10 + 2.4 = **192.4°C** ✓ (rango realista)
+  - Agregar parámetro `bagazo_humidity` a la función
+
+- [ ] **Tarea 2**: Actualizar llamada en `balance.py:338`
+  - Pasar `inputs.bagazo_humidity` como nuevo parámetro
+
+- [ ] **Tarea 3**: Actualizar tests en `test_combustion.py`
+  - Ajustar `TestFlueGasTemperature` a los nuevos rangos (150-250°C)
+
+- [ ] **Tarea 4**: Verificar que tests pasen y que el ratio no se afecte
