@@ -326,34 +326,38 @@ def calculate_flue_gas_flow(m_fuel_kgh: float,
     }
 
 
-def estimate_flue_gas_temperature(T_steam: float, excess_air: float) -> float:
+def estimate_flue_gas_temperature(excess_air: float,
+                                   bagazo_humidity: float = 48.0) -> float:
     """
-    Estima la temperatura de gases de combustión.
+    Estima la temperatura de gases de chimenea en calderas bagaceras.
 
     Parameters
     ----------
-    T_steam : float
-        Temperatura del vapor [°C]
     excess_air : float
         Exceso de aire [%]
+    bagazo_humidity : float
+        Humedad del bagazo [%]
 
     Returns
     -------
     float
-        Temperatura estimada de gases [°C]
+        Temperatura estimada de gases de chimenea [°C]
 
     Notes
     -----
-    Estimación empírica para calderas bagaceras.
-    T_gases ≈ T_steam - 10 + (excess_air / 5)
+    Fórmula empírica para calderas bagaceras con economizador
+    y precalentador de aire. Rango típico: 150-250°C.
     """
-    # Base: vapor - 10°C
-    T_base = T_steam - 10
+    # Temperatura base: caldera con economizador + precalentador de aire
+    T_base = 180.0
 
-    # Penalización por exceso de aire
-    T_penalty = excess_air / 5
+    # Más exceso de aire → más masa de gas → mayor temperatura de salida
+    delta_excess = excess_air * 0.5
 
-    return round(T_base + T_penalty, 1)
+    # Más humedad → más vapor de agua en gases → mayor temperatura
+    delta_humidity = (bagazo_humidity - 40.0) * 0.3
+
+    return round(T_base + delta_excess + delta_humidity, 1)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════

@@ -335,7 +335,7 @@ def calculate_complete_balance(inputs: InputData) -> BalanceResults:
     )
 
     # Temperatura de gases
-    T_flue = estimate_flue_gas_temperature(inputs.T_stm, inputs.excess_air)
+    T_flue = estimate_flue_gas_temperature(inputs.excess_air, inputs.bagazo_humidity)
 
     # 7. Cenizas
     m_ash_th = bagazo_data['m_bagazo_th'] * (inputs.bagazo_ash / 100)

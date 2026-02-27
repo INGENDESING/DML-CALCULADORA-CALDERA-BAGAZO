@@ -296,21 +296,18 @@ directamente a T_vapor, lo cual es termodinámicamente incorrecto.
 
 ### Plan de corrección
 
-- [ ] **Tarea 1**: Modificar `estimate_flue_gas_temperature()` en `combustion.py`
-  - Nueva fórmula empírica realista para calderas bagaceras:
-    ```
-    T_base = 180°C  (caldera con economizador + precalentador de aire)
-    ΔT_exceso = excess_air × 0.5  (más aire → más masa → mayor T salida)
-    ΔT_humedad = (W - 40) × 0.3  (más humedad → más vapor de agua → mayor T)
-    T_gases = T_base + ΔT_exceso + ΔT_humedad
-    ```
-  - Caso base: T_gases = 180 + 10 + 2.4 = **192.4°C** ✓ (rango realista)
-  - Agregar parámetro `bagazo_humidity` a la función
+- [x] **Tarea 1**: Modificar `estimate_flue_gas_temperature()` en `combustion.py`
+  - Eliminado parámetro `T_steam`, agregado `bagazo_humidity`
+  - Nueva fórmula: `T = 180 + excess_air×0.5 + (humidity-40)×0.3`
+  - Caso base: **192.4°C** ✓
 
-- [ ] **Tarea 2**: Actualizar llamada en `balance.py:338`
-  - Pasar `inputs.bagazo_humidity` como nuevo parámetro
+- [x] **Tarea 2**: Actualizar llamada en `balance.py:338`
+  - `estimate_flue_gas_temperature(inputs.excess_air, inputs.bagazo_humidity)`
 
-- [ ] **Tarea 3**: Actualizar tests en `test_combustion.py`
-  - Ajustar `TestFlueGasTemperature` a los nuevos rangos (150-250°C)
+- [x] **Tarea 3**: Actualizar tests en `test_combustion.py`
+  - 4 tests: exceso de aire, humedad, caso base (~192°C), rango realista (150-250°C)
 
-- [ ] **Tarea 4**: Verificar que tests pasen y que el ratio no se afecte
+- [x] **Tarea 4**: Verificar que tests pasen y que el ratio no se afecte
+  - **22/22 tests pasando** ✓
+  - T_gases caso base: 192.4°C ✓
+  - Ratio y balance de energía: sin cambios (T_flue es solo visualización)
