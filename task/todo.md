@@ -311,3 +311,42 @@ directamente a T_vapor, lo cual es termodinámicamente incorrecto.
   - **22/22 tests pasando** ✓
   - T_gases caso base: 192.4°C ✓
   - Ratio y balance de energía: sin cambios (T_flue es solo visualización)
+
+---
+
+## 11. CORRECCIÓN: T_gases = 125°C y energía del aire precalentado (2026-02-27)
+
+### Problema
+1. La etiqueta del PFD muestra T_gases ≈ 192°C, pero el **valor real medido es 125°C**.
+2. La corriente de aire muestra `energy_MW = 0` (no se cuenta energía del aire).
+3. En la caldera real, un **precalentador de aire** recupera calor de los gases de salida
+   para calentar el aire de entrada. Esto explica que T_gases sea tan bajo (125°C).
+
+### Impacto
+- T_flue sigue siendo solo visualización — **NO afecta** ratio ni balance energético.
+- El cambio de energía del aire es **informativo** (muestra la energía del aire precalentado).
+- No se modifica la lógica del balance de energía (Q_abs, Q_fuel, eficiencia).
+
+### Plan de corrección (3 cambios simples)
+
+- [ ] **Tarea 1**: Modificar `estimate_flue_gas_temperature()` en `combustion.py`
+  - Cambiar fórmula para que el caso base retorne **125°C**
+  - Nueva fórmula: `T = 110 + excess_air×0.3 + (humidity-40)×0.2`
+  - Caso base (20% exceso, 48% humedad): `110 + 6 + 1.6 = 117.6 ≈ 125°C`
+  - O simplemente usar T_base = 115: `115 + 6 + 1.6 = 122.6 ≈ 125°C`
+  - Rango esperado: ~100-160°C (calderas con economizador + precalentador)
+
+- [ ] **Tarea 2**: Actualizar tests en `test_combustion.py`
+  - Ajustar rangos de temperatura esperados (100-160°C en vez de 150-250°C)
+  - Caso base: ~125°C
+
+- [ ] **Tarea 3**: Verificar que la etiqueta del PFD muestre 125°C
+  - El PFD ya lee `T_flue` de `results_dict` → se actualiza automáticamente
+  - Solo verificar que el flujo de datos sea correcto
+
+- [ ] **Tarea 4** (Opcional): Calcular energía del aire precalentado
+  - Actualmente `air.energy_MW = 0`
+  - Calcular: `Q_air = m_air × Cp_air × (T_air_precalentado - T_amb) / 3600000`
+  - Estimar T_air precalentado desde el balance del precalentador:
+    `m_flue × Cp_gas × (T_flue_pre - 125) ≈ m_air × Cp_air × (T_air_out - T_amb)`
+  - **Pregunta para el usuario**: ¿Quieres mostrar esta energía del aire o solo ajustar T_gases a 125°C?
