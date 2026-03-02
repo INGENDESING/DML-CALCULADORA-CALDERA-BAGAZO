@@ -220,6 +220,50 @@ scipy>=1.11.0
 
 ---
 
+## 13. CORRECCIÓN: Layout PFD arriba + KPIs siempre visibles (2026-03-02)
+
+### Problema
+La última actualización agregó dos gráficas (Ratio vs Cenizas y Ratio vs Eficiencia) en la parte superior del content area. Sin embargo, lo que se necesita es:
+1. El **diagrama PFD/P&ID** siempre visible en la parte superior con datos base de cálculo
+2. Los **KPIs** siempre visibles debajo del PFD (con valores "--" antes de calcular)
+3. **Eliminar** las dos gráficas superiores
+
+### Plan de corrección
+
+- [ ] **Tarea 1**: Eliminar gráficas superiores en `layout_main.py`
+  - Eliminar el bloque HTML de las dos gráficas top (líneas 298-326)
+  - Eliminar el callback `update_top_charts()` en `app.py` (líneas 342-349)
+
+- [ ] **Tarea 2**: Agregar diagrama PFD siempre visible arriba en `layout_main.py`
+  - Agregar un `html.Div(id='pid-always-visible')` en la parte superior del content area
+  - Este contenedor se actualiza con el diagrama PFD usando datos de inputs del sidebar
+
+- [ ] **Tarea 3**: Mover KPIs fuera de results-container en `layout_main.py`
+  - Sacar `kpi-ratio-container` y `kpi-secondary-container` del `results-container`
+  - Colocarlos debajo del diagrama PFD, siempre visibles
+
+- [ ] **Tarea 4**: Crear callback para PFD siempre visible en `app.py`
+  - Nuevo callback que toma los valores de inputs del sidebar (State) y los resultados (Input store-results)
+  - Si hay resultados calculados → muestra PFD con resultados completos
+  - Si no hay resultados → muestra PFD con los valores de los inputs del sidebar (flujo vapor, temperaturas, etc.)
+
+- [ ] **Tarea 5**: Actualizar callbacks de KPIs en `app.py`
+  - Modificar `update_ratio_kpi()` para mostrar "--" cuando no hay resultados
+  - Modificar `update_secondary_kpis()` para mostrar "--" cuando no hay resultados
+
+- [ ] **Tarea 6**: Eliminar tab P&ID de los tabs de resultados
+  - Eliminar el tab `tab-pid` ya que el PFD ahora está siempre visible arriba
+  - Actualizar el valor default del tab a `tab-charts`
+  - Eliminar el caso `tab-pid` del callback `update_tabs_content()`
+
+- [ ] **Tarea 7**: Verificar y hacer commit/push
+
+### Archivos a modificar
+1. `app/frontend/layouts/layout_main.py` — Layout (tareas 1, 2, 3, 6)
+2. `app/frontend/app.py` — Callbacks (tareas 1, 4, 5, 6)
+
+---
+
 ## 8. CORRECCIÓN BUG: KPI Principal Ratio Vapor/Bagazo (2026-02-26)
 
 ### Problema
