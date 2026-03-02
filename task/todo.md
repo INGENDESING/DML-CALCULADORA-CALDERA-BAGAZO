@@ -424,19 +424,40 @@ El PDF se genera con ReportLab. El PFD del browser es HTML/SVG, así que se recr
 - 4 corrientes de salida (derecha) con etiquetas de datos
 - Flechas indicando dirección de flujo
 
-- [ ] **Tarea 1**: Agregar sección de KPIs al PDF en `report_generator.py`
-  - KPI principal: Ratio Vapor/Bagazo (valor grande)
-  - KPIs secundarios en tabla: Flujo Bagazo, Flujo Agua, PCI Bagazo, Calor Absorbido
+- [x] **Tarea 1**: Agregar sección de KPIs al PDF en `report_generator.py`
+  - KPI principal: Ratio Vapor/Bagazo (valor grande, centrado, fondo azul)
+  - KPIs secundarios en fila: Flujo Bagazo, Flujo Agua, PCI Bagazo, Calor Absorbido
+  - Cada KPI con color de fondo distinto
 
-- [ ] **Tarea 2**: Agregar diagrama PFD al PDF en `report_generator.py`
-  - Usar `ReportLab Drawing` con `Rect`, `Line`, `String`
-  - Rectángulo central "CALDERA ACUOTUBULAR"
-  - 3 etiquetas entrada (izq): Agua Alimentación, Bagazo, Aire
-  - 4 etiquetas salida (der): Vapor, Purga, Gases, Cenizas
-  - Líneas con flechas de flujo
+- [x] **Tarea 2**: Agregar diagrama PFD al PDF en `report_generator.py`
+  - Función `_create_pfd_drawing(results)` usando `Drawing`, `Rect`, `Line`, `String`, `Polygon`
+  - Rectángulo central "CALDERA ACUOTUBULAR" con fondo azul oscuro
+  - 3 etiquetas entrada (izq): Agua Alimentación, Bagazo, Aire — con flechas
+  - 4 etiquetas salida (der): Vapor, Purga, Gases, Cenizas — con flechas
+  - Cada corriente con datos: Flujo, Temp, Presión, Entalpía, Energía según aplique
 
-- [ ] **Tarea 3**: Reemplazar tablas de balance por tabla de resultados unificada
+- [x] **Tarea 3**: Reemplazar tablas de balance por tabla de resultados unificada
   - Columnas: Tipo | Corriente | Flujo [t/h] | T [°C] | Energía [MW]
   - Misma estructura que `create_results_table()` en web
+  - Filas ENTRADA con fondo azul claro, SALIDA con fondo naranja claro, separador gris
 
-- [ ] **Tarea 4**: Commit y push
+- [x] **Tarea 4**: Commit y push
+
+### Revisión
+
+**Archivo modificado:** `app/frontend/components/report_generator.py` (reescritura completa)
+
+**Nuevo contenido del PDF (en orden):**
+1. Encabezado (DML INGENIEROS CONSULTORES S.A.S. + título + fecha)
+2. **KPIs** — Ratio grande + 4 KPIs secundarios en fila
+3. **Diagrama PFD** — Drawing con caldera central, 7 corrientes con flechas y datos
+4. Datos de entrada (tabla de parámetros del usuario)
+5. **Tabla de resultados** — 5 columnas, entradas y salidas con colores
+6. Eficiencia (tabla con Q_abs, Q_fuel, pérdidas)
+7. Pie de página
+
+**Helpers agregados:**
+- `_fmt(val, decimals)` — formatea valores numéricos de forma segura
+- `_create_pfd_drawing(results)` — genera el diagrama PFD como Drawing de ReportLab
+
+**Verificación:** PDF generado exitosamente con datos del caso base (6,365 bytes)
