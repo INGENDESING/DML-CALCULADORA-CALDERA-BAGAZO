@@ -88,19 +88,23 @@ Mejorar la usabilidad del dashboard con tres cambios puntuales:
 
 ### Tareas
 
-- [ ] **T1. Mostrar min/max debajo de cada input numérico (panel izquierdo)**
+- [x] **T1. Mostrar min/max debajo de cada input numérico (panel izquierdo)**
   - Archivo: `app/frontend/layouts/layout_main.py`
   - Función: `create_input_number()`
   - Cambio: añadir `html.Small(f"Min: {min_val} | Max: {max_val}")` debajo del `dcc.Input`
   - Afecta solo a los inputs numéricos (VAPOR, BAGAZO, AIRE), no a los de texto
 
-- [ ] **T2. Gráfica siempre visible en la parte superior del área de contenido**
+- [x] **T2. Gráfica siempre visible en la parte superior del área de contenido**
   - Archivo: `app/frontend/layouts/layout_main.py` — `create_content_area()`
   - Añadir un bloque fijo con dos `dcc.Graph` (`id='chart-top-ash'` y `id='chart-top-eff'`) siempre renderizado, con o sin cálculo
-  - Archivo: `app/frontend/app.py` — nuevo callback
-  - El callback usa datos base por defecto (humedad=48%, ceniza=10%, eficiencia=94%) para renderizar las curvas desde el inicio; se actualiza con los resultados tras calcular
+  - Archivo: `app/frontend/app.py` — nuevo callback `update_top_charts`
+  - El callback usa datos base por defecto (dict vacío) para renderizar las curvas desde el inicio; se actualiza con los resultados tras calcular
 
-- [ ] **T3. KPI indicators debajo de la gráfica**
-  - Archivo: `app/frontend/layouts/layout_main.py` — `create_content_area()`
-  - Reordenar el bloque `results-container`: primero gráfica (T2), luego kpi-ratio-container, luego kpi-secondary-container, luego tabs y reporte
-  - El bloque de gráfica superior (T2) va fuera del `results-container` para que sea independiente del estado de cálculo
+- [x] **T3. KPI indicators debajo de la gráfica**
+  - La gráfica queda fuera del `results-container`, por lo que los KPIs (dentro del `results-container`) aparecen naturalmente debajo de la gráfica al calcular
+  - Orden final: Gráfica (siempre) → KPI Ratio → KPI Secundarios → Tabs → Reporte
+
+## Revisión de Reorganización del Dashboard
+- **T1**: Se añadió `html.Small(f"Min: {min_val} | Max: {max_val}")` en `create_input_number()`. Cambio mínimo de 3 líneas.
+- **T2**: Se añadió un bloque `html.Div` con dos `dcc.Graph` (ids `chart-top-ash` y `chart-top-eff`) al inicio de `create_content_area()`, y un callback `update_top_charts` en `app.py` que los alimenta con datos base o con resultados del cálculo.
+- **T3**: Resuelto implícitamente por T2 — al colocar la gráfica fuera del `results-container`, los KPIs quedan debajo de ella de forma natural.
