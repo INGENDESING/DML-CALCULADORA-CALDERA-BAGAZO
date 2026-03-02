@@ -350,21 +350,10 @@ def create_content_area() -> html.Div:
             'display': 'none'
         }, children=[
             # Tabs para diferentes vistas
-            dcc.Tabs(id='results-tabs', value='tab-charts', style={
+            dcc.Tabs(id='results-tabs', value='tab-table', style={
                 'background': COLORS['bg_secondary']
             }, children=[
-                dcc.Tab(label='Gráficos de Análisis', value='tab-charts', style={
-                    'background': COLORS['bg_tertiary'],
-                    'color': COLORS['text_primary'],
-                    'border': f"1px solid {COLORS['border']}",
-                    'borderRadius': '6px 6px 0 0',
-                    'padding': '10px 20px',
-                    'marginRight': '4px'
-                }, selected_style={
-                    'background': COLORS['accent'],
-                    'color': COLORS['text_primary'],
-                    'border': f"1px solid {COLORS['accent']}",
-                }),
+                # Tab Gráficos oculto (código conservado en app.py callback)
                 dcc.Tab(label='Tabla de Resultados', value='tab-table', style={
                     'background': COLORS['bg_tertiary'],
                     'color': COLORS['text_primary'],
