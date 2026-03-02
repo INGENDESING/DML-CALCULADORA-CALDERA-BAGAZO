@@ -78,3 +78,29 @@ Este es el plan para solucionar el error "Please set your LaTeX formatter in `la
 - Se purgó el directorio de todos los remanentes inútiles para el proyecto base de LaTeX (.pptx, logs viejos, scripts innecesarios y archivos de reportes superados).
 - Se rediseñó por completo el archivo `emitido/Transmittal_HRosero.html` para cumplir con la estética actual de "modo oscuro", actualizando todos los códigos (`P2807`), las descripciones del reporte y los remitentes.
 - Se generó exitosamente la presentación Premium Interactiva en HTML `emitido/P2807-PR-DP-001_Presentacion.html` de 10 diapositivas basada totalmente en los cálculos del informe.
+
+---
+
+## Nuevas Tareas: Reorganización del Dashboard (2026-03-02)
+
+### Objetivo
+Mejorar la usabilidad del dashboard con tres cambios puntuales:
+
+### Tareas
+
+- [ ] **T1. Mostrar min/max debajo de cada input numérico (panel izquierdo)**
+  - Archivo: `app/frontend/layouts/layout_main.py`
+  - Función: `create_input_number()`
+  - Cambio: añadir `html.Small(f"Min: {min_val} | Max: {max_val}")` debajo del `dcc.Input`
+  - Afecta solo a los inputs numéricos (VAPOR, BAGAZO, AIRE), no a los de texto
+
+- [ ] **T2. Gráfica siempre visible en la parte superior del área de contenido**
+  - Archivo: `app/frontend/layouts/layout_main.py` — `create_content_area()`
+  - Añadir un bloque fijo con dos `dcc.Graph` (`id='chart-top-ash'` y `id='chart-top-eff'`) siempre renderizado, con o sin cálculo
+  - Archivo: `app/frontend/app.py` — nuevo callback
+  - El callback usa datos base por defecto (humedad=48%, ceniza=10%, eficiencia=94%) para renderizar las curvas desde el inicio; se actualiza con los resultados tras calcular
+
+- [ ] **T3. KPI indicators debajo de la gráfica**
+  - Archivo: `app/frontend/layouts/layout_main.py` — `create_content_area()`
+  - Reordenar el bloque `results-container`: primero gráfica (T2), luego kpi-ratio-container, luego kpi-secondary-container, luego tabs y reporte
+  - El bloque de gráfica superior (T2) va fuera del `results-container` para que sea independiente del estado de cálculo
