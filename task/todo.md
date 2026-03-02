@@ -405,3 +405,38 @@ directamente a T_vapor, lo cual es termodinámicamente incorrecto.
 - El balance ahora responde correctamente al exceso de aire del usuario
 - Más aire → menor T_gases → menos energía perdida por chimenea
 - Todas las corrientes del PFD muestran datos completos
+
+---
+
+## 14. MEJORA: Reporte PDF con PFD, KPIs y Tabla de Resultados (2026-03-02)
+
+### Problema
+El reporte PDF actual muestra datos genéricos de balance (entradas/salidas, energía, eficiencia) pero **no incluye**:
+1. El **diagrama PFD** con las etiquetas de corrientes de entrada y salida
+2. Los **KPIs** (Ratio Vapor/Bagazo, Flujo Bagazo, Flujo Agua, PCI Bagazo, Calor Absorbido)
+3. La **tabla de resultados** tal como se muestra en la web
+
+### Plan de corrección
+
+El PDF se genera con ReportLab. El PFD del browser es HTML/SVG, así que se recreará como diagrama simplificado usando `ReportLab Drawing` con:
+- Un rectángulo central "CALDERA ACUOTUBULAR"
+- 3 corrientes de entrada (izquierda) con etiquetas de datos
+- 4 corrientes de salida (derecha) con etiquetas de datos
+- Flechas indicando dirección de flujo
+
+- [ ] **Tarea 1**: Agregar sección de KPIs al PDF en `report_generator.py`
+  - KPI principal: Ratio Vapor/Bagazo (valor grande)
+  - KPIs secundarios en tabla: Flujo Bagazo, Flujo Agua, PCI Bagazo, Calor Absorbido
+
+- [ ] **Tarea 2**: Agregar diagrama PFD al PDF en `report_generator.py`
+  - Usar `ReportLab Drawing` con `Rect`, `Line`, `String`
+  - Rectángulo central "CALDERA ACUOTUBULAR"
+  - 3 etiquetas entrada (izq): Agua Alimentación, Bagazo, Aire
+  - 4 etiquetas salida (der): Vapor, Purga, Gases, Cenizas
+  - Líneas con flechas de flujo
+
+- [ ] **Tarea 3**: Reemplazar tablas de balance por tabla de resultados unificada
+  - Columnas: Tipo | Corriente | Flujo [t/h] | T [°C] | Energía [MW]
+  - Misma estructura que `create_results_table()` en web
+
+- [ ] **Tarea 4**: Commit y push
