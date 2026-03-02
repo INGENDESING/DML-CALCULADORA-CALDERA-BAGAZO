@@ -295,35 +295,12 @@ def create_input_number(input_id: str, label: str, default: float,
 def create_content_area() -> html.Div:
     """Crea el área de contenido con resultados."""
     return html.Div([
-        # Gráfica siempre visible (condición base por defecto)
-        html.Div([
-            html.Div([
-                html.Div([
-                    html.H5('Ratio vs % Cenizas', style={
-                        'color': COLORS['text_primary'],
-                        'fontSize': '13px',
-                        'margin': '0 0 4px 0'
-                    }),
-                    dcc.Graph(id='chart-top-ash', style={'height': '260px'},
-                              config={'displayModeBar': False})
-                ], style={'width': '50%', 'paddingRight': '8px'}),
-                html.Div([
-                    html.H5('Ratio vs Eficiencia', style={
-                        'color': COLORS['text_primary'],
-                        'fontSize': '13px',
-                        'margin': '0 0 4px 0'
-                    }),
-                    dcc.Graph(id='chart-top-eff', style={'height': '260px'},
-                              config={'displayModeBar': False})
-                ], style={'width': '50%', 'paddingLeft': '8px'}),
-            ], style={'display': 'flex'}),
-        ], style={
-            'background': COLORS['bg_secondary'],
-            'border': f"1px solid {COLORS['border']}",
-            'borderRadius': '8px',
-            'padding': '16px',
-            'marginBottom': '20px'
-        }),
+        # Diagrama PFD siempre visible
+        html.Div(id='pid-always-visible'),
+
+        # KPIs siempre visibles
+        html.Div(id='kpi-ratio-container', style={'marginTop': '16px'}),
+        html.Div(id='kpi-secondary-container', style={'marginTop': '12px'}),
 
         # Loading overlay
         html.Div(id='loading-overlay', style={
@@ -372,32 +349,10 @@ def create_content_area() -> html.Div:
         html.Div(id='results-container', style={
             'display': 'none'
         }, children=[
-            # KPI Principal - Ratio
-            html.Div(id='kpi-ratio-container'),
-
-            html.Hr(style={'border': f'1px solid {COLORS["border"]}', 'margin': '20px 0'}),
-
-            # KPIs Secundarios
-            html.Div(id='kpi-secondary-container'),
-
-            html.Hr(style={'border': f'1px solid {COLORS["border"]}', 'margin': '20px 0'}),
-
             # Tabs para diferentes vistas
-            dcc.Tabs(id='results-tabs', value='tab-pid', style={
+            dcc.Tabs(id='results-tabs', value='tab-charts', style={
                 'background': COLORS['bg_secondary']
             }, children=[
-                dcc.Tab(label='Diagrama P&ID/PFD', value='tab-pid', style={
-                    'background': COLORS['bg_tertiary'],
-                    'color': COLORS['text_primary'],
-                    'border': f"1px solid {COLORS['border']}",
-                    'borderRadius': '6px 6px 0 0',
-                    'padding': '10px 20px',
-                    'marginRight': '4px'
-                }, selected_style={
-                    'background': COLORS['accent'],
-                    'color': COLORS['text_primary'],
-                    'border': f"1px solid {COLORS['accent']}",
-                }),
                 dcc.Tab(label='Gráficos de Análisis', value='tab-charts', style={
                     'background': COLORS['bg_tertiary'],
                     'color': COLORS['text_primary'],

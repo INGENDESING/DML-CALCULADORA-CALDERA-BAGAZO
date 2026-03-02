@@ -163,6 +163,7 @@ def calculate_balance(n_clicks, m_stm, P_stm, T_stm, T_fw, pct_purge, efficiency
             'altitude': float(results.inputs.altitude),
             'RH': float(results.inputs.RH),
             'excess_air': float(results.inputs.excess_air),
+            'PCI_MJ_kg': results.bagazo.composition.get('PCI_MJ_kg', 0),
         }
 
         success_style = {'display': 'block', 'background': f'{COLORS["success"]}20',
@@ -183,13 +184,43 @@ def calculate_balance(n_clicks, m_stm, P_stm, T_stm, T_fw, pct_purge, efficiency
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# CALLBACK PFD Siempre Visible
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@app.callback(
+    Output('pid-always-visible', 'children'),
+    [Input('store-results', 'data'),
+     Input('m_stm', 'value'),
+     Input('P_stm', 'value'),
+     Input('T_stm', 'value'),
+     Input('T_fw', 'value'),
+     Input('T_amb', 'value'),
+     Input('excess_air', 'value')]
+)
+def update_pid_always_visible(results, m_stm, P_stm, T_stm, T_fw, T_amb, excess_air):
+    """Muestra PFD siempre visible. Con resultados reales o datos base de inputs."""
+    if results:
+        return create_pid_image(results)
+    # Datos base desde los inputs del sidebar
+    base_data = {
+        'm_stm': m_stm or '-', 'P_stm': P_stm or '-', 'T_stm': T_stm or '-',
+        'T_fw': T_fw or '-', 'T_amb': T_amb or '-', 'excess_air': excess_air or '-',
+        'm_fw': '-', 'm_bagazo': '-', 'm_air': '-', 'm_purge': '-',
+        'm_flue': '-', 'm_ash': '-', 'T_flue': '-', 'T_purge': '-',
+        'Q_fw': '-', 'Q_steam': '-', 'Q_fuel': '-', 'Q_purge': '-', 'Q_flue': '-',
+        'h_steam': '-',
+    }
+    return create_pid_image(base_data)
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # CALLBACK KPI Ratio
 # ═══════════════════════════════════════════════════════════════════════════════
 
 @app.callback(Output('kpi-ratio-container', 'children'), [Input('store-results', 'data')])
 def update_ratio_kpi(results):
     if not results:
-        return html.Div()
+        return create_ratio_kpi(0)
     return create_ratio_kpi(results['ratio'])
 
 
@@ -200,16 +231,26 @@ def update_ratio_kpi(results):
 @app.callback(Output('kpi-secondary-container', 'children'), [Input('store-results', 'data')])
 def update_secondary_kpis(results):
     if not results:
-        return html.Div()
+        kpis = [
+            {'title': 'Flujo Bagazo', 'value': '--', 'unit': 't/h',
+             'subtitle': 'Combustible', 'color': COLORS['warning']},
+            {'title': 'Flujo Agua', 'value': '--', 'unit': 't/h',
+             'subtitle': 'Alimentación', 'color': COLORS['accent']},
+            {'title': 'PCI Bagazo', 'value': '--', 'unit': 'MJ/kg',
+             'subtitle': 'Poder Calorífico Inferior', 'color': COLORS['error']},
+            {'title': 'Calor Absorbido', 'value': '--', 'unit': 'MW',
+             'subtitle': 'Q_abs', 'color': COLORS['success']},
+        ]
+        return create_kpi_row(kpis)
     kpis = [
         {'title': 'Flujo Bagazo', 'value': f"{results['m_bagazo']:.2f}", 'unit': 't/h',
          'subtitle': 'Combustible', 'color': COLORS['warning']},
         {'title': 'Flujo Agua', 'value': f"{results['m_fw']:.2f}", 'unit': 't/h',
          'subtitle': 'Alimentación', 'color': COLORS['accent']},
+        {'title': 'PCI Bagazo', 'value': f"{results.get('PCI_MJ_kg', 0):.2f}", 'unit': 'MJ/kg',
+         'subtitle': 'Poder Calorífico Inferior', 'color': COLORS['error']},
         {'title': 'Calor Absorbido', 'value': f"{results['Q_abs']:.2f}", 'unit': 'MW',
          'subtitle': 'Q_abs', 'color': COLORS['success']},
-        {'title': 'Calor Combustible', 'value': f"{results['Q_fuel']:.2f}", 'unit': 'MW',
-         'subtitle': 'Q_fuel', 'color': COLORS['error']},
     ]
     return create_kpi_row(kpis)
 
@@ -223,9 +264,7 @@ def update_tabs_content(active_tab, results):
     if not results:
         return html.Div('Esperando resultados...', style={'textAlign': 'center', 'padding': '40px', 'color': COLORS['text_secondary']})
 
-    if active_tab == 'tab-pid':
-        return create_pid_image(results)
-    elif active_tab == 'tab-charts':
+    if active_tab == 'tab-charts':
         return html.Div([html.Div([html.Div([html.H5('Ratio vs Cenizas', style={'color': COLORS['text_primary']}),
                                                  dcc.Graph(figure=create_ratio_vs_ash_curve(results), style={'height': '300px'})],
                                                 style={'width': '48%', 'display': 'inline-block'}),
@@ -338,15 +377,6 @@ def handle_pdf_modal(report_clicks, close_clicks, results):
 
     return None, {'display': 'none'}, {'display': 'none'}
 
-
-@app.callback(
-    [Output('chart-top-ash', 'figure'), Output('chart-top-eff', 'figure')],
-    [Input('store-results', 'data')]
-)
-def update_top_charts(results):
-    """Actualiza las gráficas superiores. Usa datos base si no hay resultados."""
-    base = results if results else {}
-    return create_ratio_vs_ash_curve(base), create_ratio_vs_efficiency_curve(base)
 
 
 @app.callback(Output('store-theme', 'data'), [Input('btn-theme-toggle', 'n_clicks')], [State('store-theme', 'data')])
