@@ -564,7 +564,9 @@ def _stream_label(title, rows, color):
 
 def create_pid_image(results: Dict) -> html.Div:
     """
-    Crea diagrama PFD usando imagen1.png con etiquetas dinámicas superpuestas.
+    Crea diagrama PFD usando PFD.svg con etiquetas a los lados.
+
+    Layout: [Etiquetas entrada] | [SVG + marca de agua] | [Etiquetas salida]
 
     Parameters
     ----------
@@ -574,11 +576,10 @@ def create_pid_image(results: Dict) -> html.Div:
     Returns
     -------
     html.Div
-        Componente HTML con imagen + etiquetas posicionadas
+        Componente HTML con layout de 3 columnas
     """
     # Estilo base para etiquetas
     label_base = {
-        'position': 'absolute',
         'background': 'rgba(30, 30, 30, 0.92)',
         'border': '2px solid',
         'borderRadius': '6px',
@@ -586,45 +587,38 @@ def create_pid_image(results: Dict) -> html.Div:
         'fontFamily': 'Consolas, monospace',
         'color': '#FFFFFF',
         'fontSize': '10px',
-        'zIndex': '10',
         'whiteSpace': 'nowrap',
+        'marginBottom': '12px',
     }
 
     # ── ENTRADAS (izquierda) ─────────────────────────────────────────
 
-    # Agua de alimentación (abajo izquierda, junto a la flecha azul)
     lbl_fw = html.Div(
         _stream_label('AGUA DE ALIMENTACIÓN', [
             f"Flujo: {results.get('m_fw', '-')} t/h",
             f"Temp: {results.get('T_fw', '-')} °C",
             f"E: {results.get('Q_fw', '-')} MW",
         ], COLORS['stream_water']),
-        style={**label_base, 'borderColor': COLORS['stream_water'],
-               'bottom': '8%', 'left': '1%'})
+        style={**label_base, 'borderColor': COLORS['stream_water']})
 
-    # Bagazo (arriba izquierda)
     lbl_bag = html.Div(
         _stream_label('BAGAZO (AR)', [
             f"Flujo: {results.get('m_bagazo', '-')} t/h",
             f"Temp: {results.get('T_amb', '-')} °C",
             f"E: {results.get('Q_fuel', '-')} MW",
         ], COLORS['stream_fuel']),
-        style={**label_base, 'borderColor': COLORS['stream_fuel'],
-               'top': '18%', 'left': '1%'})
+        style={**label_base, 'borderColor': COLORS['stream_fuel']})
 
-    # Aire de combustión (medio izquierda)
     lbl_air = html.Div(
         _stream_label('AIRE DE COMBUSTIÓN', [
             f"Flujo: {results.get('m_air', '-')} t/h",
             f"Temp: {results.get('T_amb', '-')} °C",
             f"Exc: {results.get('excess_air', '-')} %",
         ], COLORS['stream_air']),
-        style={**label_base, 'borderColor': COLORS['stream_air'],
-               'top': '48%', 'left': '1%'})
+        style={**label_base, 'borderColor': COLORS['stream_air']})
 
     # ── SALIDAS (derecha) ────────────────────────────────────────────
 
-    # Vapor sobrecalentado (arriba derecha)
     lbl_stm = html.Div(
         _stream_label('VAPOR SOBRECALENTADO', [
             f"Flujo: {results.get('m_stm', '-')} t/h",
@@ -633,52 +627,90 @@ def create_pid_image(results: Dict) -> html.Div:
             f"h: {results.get('h_steam', '-')} kJ/kg",
             f"E: {results.get('Q_steam', '-')} MW",
         ], COLORS['stream_steam']),
-        style={**label_base, 'borderColor': COLORS['stream_steam'],
-               'top': '18%', 'right': '1%'})
+        style={**label_base, 'borderColor': COLORS['stream_steam']})
 
-    # Purga continua (medio derecha)
     lbl_pur = html.Div(
         _stream_label('PURGA CONTINUA', [
             f"Flujo: {results.get('m_purge', '-')} t/h",
             f"Temp: {results.get('T_purge', '-')} °C",
             f"E: {results.get('Q_purge', '-')} MW",
         ], COLORS['stream_water']),
-        style={**label_base, 'borderColor': COLORS['stream_water'],
-               'top': '55%', 'right': '1%'})
+        style={**label_base, 'borderColor': COLORS['stream_water']})
 
-    # Gases de combustión (arriba centro)
     lbl_gas = html.Div(
         _stream_label('GASES DE COMBUSTIÓN', [
             f"Flujo: {results.get('m_flue', '-')} t/h",
             f"Temp: {results.get('T_flue', '-')} °C",
             f"E: {results.get('Q_flue', '-')} MW",
         ], COLORS['stream_flue']),
-        style={**label_base, 'borderColor': COLORS['stream_flue'],
-               'top': '1%', 'left': '35%'})
+        style={**label_base, 'borderColor': COLORS['stream_flue']})
 
-    # Cenizas (abajo derecha)
     lbl_ash = html.Div(
         _stream_label('CENIZAS Y RESIDUOS', [
             f"Flujo: {results.get('m_ash', '-')} t/h",
         ], '#8B7355'),
-        style={**label_base, 'borderColor': '#8B7355',
-               'bottom': '3%', 'right': '30%'})
+        style={**label_base, 'borderColor': '#8B7355'})
+
+    # ── LAYOUT 3 COLUMNAS ────────────────────────────────────────────
 
     return html.Div([
         # Título
         html.H4('DIAGRAMA DE FLUJO DE PROCESO (PFD) — CALDERA ACUOTUBULAR',
                  style={'color': COLORS['text_primary'], 'marginBottom': '12px',
                         'textAlign': 'center', 'fontSize': '14px'}),
-        # Contenedor con posición relativa
+        # Contenedor flex de 3 columnas
         html.Div([
-            html.Img(src='/assets/imagen1.png', style={
-                'width': '100%', 'display': 'block', 'borderRadius': '8px'}),
-            lbl_fw, lbl_bag, lbl_air,
-            lbl_stm, lbl_pur, lbl_gas, lbl_ash,
+            # Columna izquierda - Entradas
+            html.Div([
+                html.Div('ENTRADAS', style={
+                    'fontSize': '11px', 'color': COLORS['text_secondary'],
+                    'textAlign': 'center', 'marginBottom': '8px',
+                    'fontWeight': 'bold', 'letterSpacing': '1px'
+                }),
+                lbl_fw, lbl_bag, lbl_air,
+            ], style={
+                'display': 'flex', 'flexDirection': 'column',
+                'justifyContent': 'center', 'minWidth': '180px',
+                'paddingRight': '12px',
+            }),
+
+            # Columna central - SVG + marca de agua
+            html.Div([
+                html.Img(src='/assets/PFD.svg', style={
+                    'width': '100%', 'display': 'block', 'borderRadius': '8px'}),
+                # Marca de agua
+                html.Div('EN CONSTRUCCIÓN', style={
+                    'position': 'absolute',
+                    'top': '50%', 'left': '50%',
+                    'transform': 'translate(-50%, -50%) rotate(-25deg)',
+                    'fontSize': '38px', 'fontWeight': 'bold',
+                    'color': 'rgba(255, 255, 255, 0.08)',
+                    'letterSpacing': '6px',
+                    'whiteSpace': 'nowrap',
+                    'pointerEvents': 'none',
+                    'userSelect': 'none',
+                }),
+            ], style={
+                'position': 'relative', 'flex': '1',
+                'minWidth': '0',
+            }),
+
+            # Columna derecha - Salidas
+            html.Div([
+                html.Div('SALIDAS', style={
+                    'fontSize': '11px', 'color': COLORS['text_secondary'],
+                    'textAlign': 'center', 'marginBottom': '8px',
+                    'fontWeight': 'bold', 'letterSpacing': '1px'
+                }),
+                lbl_stm, lbl_pur, lbl_gas, lbl_ash,
+            ], style={
+                'display': 'flex', 'flexDirection': 'column',
+                'justifyContent': 'center', 'minWidth': '180px',
+                'paddingLeft': '12px',
+            }),
         ], style={
-            'position': 'relative',
-            'maxWidth': '1000px',
-            'margin': '0 auto',
+            'display': 'flex',
+            'alignItems': 'center',
         })
     ], style={
         'background': COLORS['bg_secondary'],
