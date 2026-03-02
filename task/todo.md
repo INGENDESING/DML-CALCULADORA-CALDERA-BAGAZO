@@ -230,37 +230,24 @@ La última actualización agregó dos gráficas (Ratio vs Cenizas y Ratio vs Efi
 
 ### Plan de corrección
 
-- [ ] **Tarea 1**: Eliminar gráficas superiores en `layout_main.py`
-  - Eliminar el bloque HTML de las dos gráficas top (líneas 298-326)
-  - Eliminar el callback `update_top_charts()` en `app.py` (líneas 342-349)
+- [x] **Tarea 1**: Eliminar gráficas superiores en `layout_main.py`
+- [x] **Tarea 2**: Agregar diagrama PFD siempre visible arriba en `layout_main.py`
+- [x] **Tarea 3**: Mover KPIs fuera de results-container en `layout_main.py`
+- [x] **Tarea 4**: Crear callback para PFD siempre visible en `app.py`
+- [x] **Tarea 5**: Actualizar callbacks de KPIs + agregar PCI Bagazo
+- [x] **Tarea 6**: Eliminar tab P&ID de los tabs de resultados
+- [x] **Tarea 7**: Verificar y hacer commit/push
 
-- [ ] **Tarea 2**: Agregar diagrama PFD siempre visible arriba en `layout_main.py`
-  - Agregar un `html.Div(id='pid-always-visible')` en la parte superior del content area
-  - Este contenedor se actualiza con el diagrama PFD usando datos de inputs del sidebar
+### Revisión de cambios
 
-- [ ] **Tarea 3**: Mover KPIs fuera de results-container en `layout_main.py`
-  - Sacar `kpi-ratio-container` y `kpi-secondary-container` del `results-container`
-  - Colocarlos debajo del diagrama PFD, siempre visibles
+**Archivos modificados:**
+1. `app/frontend/layouts/layout_main.py` — Se eliminaron las 2 gráficas top, se agregó `pid-always-visible` arriba, se movieron KPIs fuera de `results-container`, se eliminó tab P&ID
+2. `app/frontend/app.py` — Se eliminó callback `update_top_charts`, se creó callback `update_pid_always_visible` que muestra PFD con datos de inputs o resultados, se actualizaron KPIs para mostrar "--" sin datos, se agregó KPI "PCI Bagazo" (MJ/kg), se agregó `PCI_MJ_kg` al `results_dict`
 
-- [ ] **Tarea 4**: Crear callback para PFD siempre visible en `app.py`
-  - Nuevo callback que toma los valores de inputs del sidebar (State) y los resultados (Input store-results)
-  - Si hay resultados calculados → muestra PFD con resultados completos
-  - Si no hay resultados → muestra PFD con los valores de los inputs del sidebar (flujo vapor, temperaturas, etc.)
-
-- [ ] **Tarea 5**: Actualizar callbacks de KPIs en `app.py`
-  - Modificar `update_ratio_kpi()` para mostrar "--" cuando no hay resultados
-  - Modificar `update_secondary_kpis()` para mostrar "--" cuando no hay resultados
-
-- [ ] **Tarea 6**: Eliminar tab P&ID de los tabs de resultados
-  - Eliminar el tab `tab-pid` ya que el PFD ahora está siempre visible arriba
-  - Actualizar el valor default del tab a `tab-charts`
-  - Eliminar el caso `tab-pid` del callback `update_tabs_content()`
-
-- [ ] **Tarea 7**: Verificar y hacer commit/push
-
-### Archivos a modificar
-1. `app/frontend/layouts/layout_main.py` — Layout (tareas 1, 2, 3, 6)
-2. `app/frontend/app.py` — Callbacks (tareas 1, 4, 5, 6)
+**Nuevo layout:**
+- Arriba: Diagrama PFD/P&ID (siempre visible, datos base de inputs antes de calcular)
+- Medio: KPIs (Ratio + Flujo Bagazo + Flujo Agua + PCI Bagazo + Calor Absorbido)
+- Abajo: Tabs (Gráficos, Tabla, Balance Energético) — solo después de calcular
 
 ---
 
