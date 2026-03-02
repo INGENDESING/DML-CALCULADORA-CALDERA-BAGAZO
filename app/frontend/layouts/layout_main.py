@@ -435,57 +435,57 @@ def create_layout() -> html.Div:
             'height': 'calc(100vh - 60px)'
         }),
 
-        # Modal PDF
+        # Modal PDF - backdrop
+        html.Div(style={
+            'position': 'fixed',
+            'top': 0,
+            'left': 0,
+            'width': '100%',
+            'height': '100%',
+            'background': 'rgba(0,0,0,0.8)',
+            'zIndex': '9998',
+            'display': 'none'
+        }, id='pdf-modal-backdrop'),
+        # Modal PDF - contenido
         html.Div([
-            html.Div(style={
-                'position': 'fixed',
-                'top': 0,
-                'left': 0,
-                'width': '100%',
-                'height': '100%',
-                'background': 'rgba(0,0,0,0.8)',
-                'zIndex': '9998',
-                'display': 'none'
-            }, id='pdf-modal-backdrop'),
             html.Div([
+                html.H4('REPORTE PDF', style={
+                    'color': COLORS['text_primary'],
+                    'margin': '0 0 15px 0'
+                }),
+                html.Div(id='pdf-modal-content', style={
+                    'background': '#FFFFFF',
+                    'borderRadius': '8px',
+                    'padding': '10px',
+                    'height': '500px'
+                }),
                 html.Div([
-                    html.H4('REPORTE PDF', style={
+                    html.Button('Cerrar', id='btn-close-pdf-modal', n_clicks=0, style={
+                        'background': COLORS['accent'],
                         'color': COLORS['text_primary'],
-                        'margin': '0 0 15px 0'
-                    }),
-                    html.Div(id='pdf-modal-content', style={
-                        'background': '#FFFFFF',
-                        'borderRadius': '8px',
-                        'padding': '10px',
-                        'height': '500px'
-                    }),
-                    html.Div([
-                        html.Button('Cerrar', id='btn-close-pdf-modal', n_clicks=0, style={
-                            'background': COLORS['accent'],
-                            'color': COLORS['text_primary'],
-                            'border': 'none',
-                            'borderRadius': '6px',
-                            'padding': '8px 20px',
-                            'cursor': 'pointer',
-                            'marginTop': '15px'
-                        })
-                    ], style={'textAlign': 'center'})
-                ], style={
-                    'background': COLORS['bg_secondary'],
-                    'padding': '20px',
-                    'borderRadius': '12px',
-                    'maxWidth': '700px',
-                    'margin': '0 auto'
-                })
+                        'border': 'none',
+                        'borderRadius': '6px',
+                        'padding': '8px 20px',
+                        'cursor': 'pointer',
+                        'marginTop': '15px'
+                    })
+                ], style={'textAlign': 'center'})
             ], style={
-                'position': 'fixed',
-                'top': '50%',
-                'left': '50%',
-                'transform': 'translate(-50%, -50%)',
-                'zIndex': '9999',
-                'display': 'none'
+                'background': COLORS['bg_secondary'],
+                'padding': '20px',
+                'borderRadius': '12px',
+                'maxWidth': '700px',
+                'margin': '0 auto'
             })
-        ], id='pdf-modal'),
+        ], id='pdf-modal', style={
+            'position': 'fixed',
+            'top': '50%',
+            'left': '50%',
+            'transform': 'translate(-50%, -50%)',
+            'zIndex': '9999',
+            'display': 'none',
+            'width': '90%',
+        }),
 
         # Modal About
         html.Div(id='modal-about', style={
