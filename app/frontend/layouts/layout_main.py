@@ -279,7 +279,12 @@ def create_input_number(input_id: str, label: str, default: float,
                 'padding': '6px 10px',
                 'fontSize': '12px'
             }
-        )
+        ),
+        html.Small(f'Min: {min_val} | Max: {max_val}', style={
+            'color': COLORS['text_secondary'],
+            'fontSize': '10px',
+            'opacity': '0.7'
+        })
     ], style={'marginBottom': '12px'})
 
 
@@ -290,6 +295,36 @@ def create_input_number(input_id: str, label: str, default: float,
 def create_content_area() -> html.Div:
     """Crea el área de contenido con resultados."""
     return html.Div([
+        # Gráfica siempre visible (condición base por defecto)
+        html.Div([
+            html.Div([
+                html.Div([
+                    html.H5('Ratio vs % Cenizas', style={
+                        'color': COLORS['text_primary'],
+                        'fontSize': '13px',
+                        'margin': '0 0 4px 0'
+                    }),
+                    dcc.Graph(id='chart-top-ash', style={'height': '260px'},
+                              config={'displayModeBar': False})
+                ], style={'width': '50%', 'paddingRight': '8px'}),
+                html.Div([
+                    html.H5('Ratio vs Eficiencia', style={
+                        'color': COLORS['text_primary'],
+                        'fontSize': '13px',
+                        'margin': '0 0 4px 0'
+                    }),
+                    dcc.Graph(id='chart-top-eff', style={'height': '260px'},
+                              config={'displayModeBar': False})
+                ], style={'width': '50%', 'paddingLeft': '8px'}),
+            ], style={'display': 'flex'}),
+        ], style={
+            'background': COLORS['bg_secondary'],
+            'border': f"1px solid {COLORS['border']}",
+            'borderRadius': '8px',
+            'padding': '16px',
+            'marginBottom': '20px'
+        }),
+
         # Loading overlay
         html.Div(id='loading-overlay', style={
             'position': 'fixed',

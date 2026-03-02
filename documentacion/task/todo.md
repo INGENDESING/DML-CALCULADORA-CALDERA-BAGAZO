@@ -78,3 +78,33 @@ Este es el plan para solucionar el error "Please set your LaTeX formatter in `la
 - Se purgó el directorio de todos los remanentes inútiles para el proyecto base de LaTeX (.pptx, logs viejos, scripts innecesarios y archivos de reportes superados).
 - Se rediseñó por completo el archivo `emitido/Transmittal_HRosero.html` para cumplir con la estética actual de "modo oscuro", actualizando todos los códigos (`P2807`), las descripciones del reporte y los remitentes.
 - Se generó exitosamente la presentación Premium Interactiva en HTML `emitido/P2807-PR-DP-001_Presentacion.html` de 10 diapositivas basada totalmente en los cálculos del informe.
+
+---
+
+## Nuevas Tareas: Reorganización del Dashboard (2026-03-02)
+
+### Objetivo
+Mejorar la usabilidad del dashboard con tres cambios puntuales:
+
+### Tareas
+
+- [x] **T1. Mostrar min/max debajo de cada input numérico (panel izquierdo)**
+  - Archivo: `app/frontend/layouts/layout_main.py`
+  - Función: `create_input_number()`
+  - Cambio: añadir `html.Small(f"Min: {min_val} | Max: {max_val}")` debajo del `dcc.Input`
+  - Afecta solo a los inputs numéricos (VAPOR, BAGAZO, AIRE), no a los de texto
+
+- [x] **T2. Gráfica siempre visible en la parte superior del área de contenido**
+  - Archivo: `app/frontend/layouts/layout_main.py` — `create_content_area()`
+  - Añadir un bloque fijo con dos `dcc.Graph` (`id='chart-top-ash'` y `id='chart-top-eff'`) siempre renderizado, con o sin cálculo
+  - Archivo: `app/frontend/app.py` — nuevo callback `update_top_charts`
+  - El callback usa datos base por defecto (dict vacío) para renderizar las curvas desde el inicio; se actualiza con los resultados tras calcular
+
+- [x] **T3. KPI indicators debajo de la gráfica**
+  - La gráfica queda fuera del `results-container`, por lo que los KPIs (dentro del `results-container`) aparecen naturalmente debajo de la gráfica al calcular
+  - Orden final: Gráfica (siempre) → KPI Ratio → KPI Secundarios → Tabs → Reporte
+
+## Revisión de Reorganización del Dashboard
+- **T1**: Se añadió `html.Small(f"Min: {min_val} | Max: {max_val}")` en `create_input_number()`. Cambio mínimo de 3 líneas.
+- **T2**: Se añadió un bloque `html.Div` con dos `dcc.Graph` (ids `chart-top-ash` y `chart-top-eff`) al inicio de `create_content_area()`, y un callback `update_top_charts` en `app.py` que los alimenta con datos base o con resultados del cálculo.
+- **T3**: Resuelto implícitamente por T2 — al colocar la gráfica fuera del `results-container`, los KPIs quedan debajo de ella de forma natural.

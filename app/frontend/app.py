@@ -339,6 +339,16 @@ def handle_pdf_modal(report_clicks, close_clicks, results):
     return None, {'display': 'none'}, {'display': 'none'}
 
 
+@app.callback(
+    [Output('chart-top-ash', 'figure'), Output('chart-top-eff', 'figure')],
+    [Input('store-results', 'data')]
+)
+def update_top_charts(results):
+    """Actualiza las gráficas superiores. Usa datos base si no hay resultados."""
+    base = results if results else {}
+    return create_ratio_vs_ash_curve(base), create_ratio_vs_efficiency_curve(base)
+
+
 @app.callback(Output('store-theme', 'data'), [Input('btn-theme-toggle', 'n_clicks')], [State('store-theme', 'data')])
 def toggle_theme(n_clicks, current_theme):
     return 'light' if n_clicks > 0 and current_theme == 'dark' else 'dark'
