@@ -287,98 +287,110 @@ def create_energy_sankey(energy_data: dict) -> go.Figure:
     """
     Crea diagrama Sankey del balance de energía.
 
+    Entradas  → Caldera → Salidas (balance siempre cerrado):
+      Q_fw + Q_fuel = Q_steam + Q_purge + Q_flue_sensible + Q_ash + Q_radiation
+
     Parameters
     ----------
     energy_data : dict
-        Diccionario con flujos de energía
-        {
-            Q_fw: energía agua alimentación [MW],
-            Q_fuel: energía combustible [MW],
-            Q_steam: energía vapor [MW],
-            Q_purge: energía purga [MW],
-            losses: pérdidas [MW]
-        }
-
-    Returns
-    -------
-    go.Figure
-        Gráfico Sankey Plotly
+        Q_fw, Q_fuel, Q_steam, Q_purge,
+        Q_flue_sensible, Q_ash, Q_radiation  [todos en MW]
     """
-    # Nodos
+    Q_fw            = energy_data.get('Q_fw', 33.6)
+    Q_fuel          = energy_data.get('Q_fuel', 68.1)
+    Q_steam         = energy_data.get('Q_steam', 96.7)
+    Q_purge         = energy_data.get('Q_purge', 0.82)
+    Q_flue_sensible = energy_data.get('Q_flue_sensible', 3.0)
+    Q_ash           = energy_data.get('Q_ash', 0.08)
+    Q_radiation     = energy_data.get('Q_radiation', 1.02)
+
+    total_in  = Q_fw + Q_fuel
+    total_out = Q_steam + Q_purge + Q_flue_sensible + Q_ash + Q_radiation
+
+    # Nodos: índice 0-7
     nodes = [
-        'Agua Alimentación',
-        'Bagazo (Combustible)',
-        'Caldera',
-        'Vapor Sobrecalentado',
-        'Purga Continua',
-        'Pérdidas'
+        'Agua Alimentación',       # 0
+        'Bagazo (Combustible)',     # 1
+        'CALDERA',                 # 2
+        'Vapor Sobrecalentado',    # 3
+        'Purga Continua',          # 4
+        'Gases de Combustión',     # 5
+        'Cenizas',                 # 6
+        'Radiación y Convección',  # 7
     ]
 
-    # Colores por nodo
     node_colors = [
-        COLORS['accent'],     # Agua (azul)
-        COLORS['warning'],    # Bagazo (naranja)
-        COLORS['text_secondary'],  # Caldera (gris)
-        COLORS['success'],    # Vapor (verde)
-        COLORS['accent'],     # Purga (azul)
-        COLORS['error'],      # Pérdidas (rojo)
+        '#0078D4',  # 0 Agua - azul
+        '#FF8C00',  # 1 Bagazo - naranja
+        '#4A4A4A',  # 2 Caldera - gris oscuro
+        '#107C10',  # 3 Vapor - verde
+        '#3498DB',  # 4 Purga - azul claro
+        '#7F8C8D',  # 5 Gases - gris
+        '#A0522D',  # 6 Cenizas - marrón
+        '#E81123',  # 7 Radiación - rojo
     ]
 
-    # Valores [origen, destino, valor]
-    Q_fw = energy_data.get('Q_fw', 33.6)
-    Q_fuel = energy_data.get('Q_fuel', 68.1)
-    Q_steam = energy_data.get('Q_steam', 96.7)
-    Q_purge = energy_data.get('Q_purge', 0.82)
-    losses = energy_data.get('losses', 4.09)
+    node_totals = [Q_fw, Q_fuel, total_in, Q_steam, Q_purge,
+                   Q_flue_sensible, Q_ash, Q_radiation]
 
-    source = [0, 1, 2, 2, 2]  # Orígenes
-    target = [2, 2, 3, 4, 5]  # Destinos
-    value = [Q_fw, Q_fuel, Q_steam, Q_purge, losses]  # Valores [MW]
+    # 7 enlaces: 2 entradas + 5 salidas desde caldera
+    source = [0, 1, 2, 2, 2, 2, 2]
+    target = [2, 2, 3, 4, 5, 6, 7]
+    value  = [Q_fw, Q_fuel, Q_steam, Q_purge, Q_flue_sensible, Q_ash, Q_radiation]
 
-    # Etiquetas para los enlaces
     link_labels = [
-        f'{Q_fw:.1f} MW',
-        f'{Q_fuel:.1f} MW',
-        f'{Q_steam:.1f} MW',
-        f'{Q_purge:.2f} MW',
-        f'{losses:.2f} MW'
+        f'Agua → {Q_fw:.2f} MW',
+        f'Bagazo → {Q_fuel:.2f} MW',
+        f'Vapor → {Q_steam:.2f} MW',
+        f'Purga → {Q_purge:.3f} MW',
+        f'Gases → {Q_flue_sensible:.3f} MW',
+        f'Cenizas → {Q_ash:.3f} MW',
+        f'Radiación → {Q_radiation:.3f} MW',
     ]
+
+    link_colors = [
+        'rgba(0, 120, 212, 0.35)',   # Agua
+        'rgba(255, 140, 0, 0.35)',   # Bagazo
+        'rgba(16, 124, 16, 0.35)',   # Vapor
+        'rgba(52, 152, 219, 0.35)',  # Purga
+        'rgba(127, 140, 141, 0.35)', # Gases
+        'rgba(160, 82, 45, 0.35)',   # Cenizas
+        'rgba(232, 17, 35, 0.35)',   # Radiación
+    ]
+
+    balance_ok = abs(total_in - total_out) < 0.01
+    balance_txt = f'✓ Balance: {total_in:.2f} MW' if balance_ok else f'⚠ Entrada {total_in:.2f} ≠ Salida {total_out:.2f} MW'
 
     fig = go.Figure(data=[go.Sankey(
+        arrangement='snap',
         node=dict(
-            pad=15,
-            thickness=20,
-            line=dict(color=COLORS['border'], width=0.5),
+            pad=20,
+            thickness=22,
+            line=dict(color='#4C4C4C', width=0.5),
             label=nodes,
             color=node_colors,
-            customdata=[Q_fw, Q_fuel, Q_fw + Q_fuel, Q_steam, Q_purge, losses],
-            hovertemplate='%{label}<br>Energía: %{customdata:.2f} MW<extra></extra>'
+            customdata=node_totals,
+            hovertemplate='%{label}<br>Energía: %{customdata:.3f} MW<extra></extra>'
         ),
         link=dict(
             source=source,
             target=target,
             value=value,
             label=link_labels,
-            color=[
-                f'rgba(0, 120, 212, 0.3)',
-                f'rgba(255, 140, 0, 0.3)',
-                f'rgba(16, 124, 16, 0.3)',
-                f'rgba(0, 120, 212, 0.3)',
-                f'rgba(232, 17, 35, 0.3)',
-            ],
+            color=link_colors,
             hovertemplate='%{label}<extra></extra>'
         )
     )])
 
     fig.update_layout(
         title=dict(
-            text='BALANCE DE ENERGÍA - DIAGRAMA SANKEY [MW]',
-            font=dict(size=16, color=COLORS['text_primary'])
+            text=f'BALANCE DE ENERGÍA [MW]  —  {balance_txt}',
+            font=dict(size=15, color='#FFFFFF')
         ),
-        font=dict(size=12, color=COLORS['text_primary']),
+        font=dict(size=12, color='#FFFFFF'),
         template=TEMPLATE,
-        height=400,
-        margin=dict(l=20, r=20, t=40, b=20)
+        height=500,
+        margin=dict(l=20, r=20, t=50, b=20)
     )
 
     return fig

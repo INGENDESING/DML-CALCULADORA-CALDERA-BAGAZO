@@ -154,6 +154,9 @@ def calculate_balance(n_clicks, m_stm, P_stm, T_stm, T_fw, pct_purge, efficiency
             'Q_purge': results.blowdown.energy_MW, 'Q_flue': results.flue_gas.energy_MW,
             'Q_fuel': results.Q_fuel_MW,
             'Q_abs': results.Q_abs_MW, 'losses': results.losses_MW,
+            'Q_ash': results.Q_ash_MW,
+            'Q_radiation': results.Q_radiation_MW,
+            'Q_flue_sensible': results.Q_flue_sensible_MW,
             'h_steam': results.steam_props['h'],
             'flue_gas_composition': results.flue_gas_composition,
             'pct_purge': float(results.inputs.pct_purge),
@@ -280,9 +283,15 @@ def update_tabs_content(active_tab, results):
                          create_results_table(results)])
     elif active_tab == 'tab-sankey':
         return html.Div([html.H4('BALANCE DE ENERGÍA', style={'color': COLORS['text_primary'], 'marginBottom': '16px'}),
-                         dcc.Graph(figure=create_energy_sankey({'Q_fw': results['Q_fw'], 'Q_fuel': results['Q_fuel'],
-                                                              'Q_steam': results['Q_steam'], 'Q_purge': results['Q_purge'],
-                                                              'losses': results['losses']}), style={'height': '400px'})])
+                         dcc.Graph(figure=create_energy_sankey({
+                             'Q_fw': results['Q_fw'],
+                             'Q_fuel': results['Q_fuel'],
+                             'Q_steam': results['Q_steam'],
+                             'Q_purge': results['Q_purge'],
+                             'Q_flue_sensible': results.get('Q_flue_sensible', 0),
+                             'Q_ash': results.get('Q_ash', 0),
+                             'Q_radiation': results.get('Q_radiation', 0),
+                         }), style={'height': '500px'})])
     return html.Div()
 
 
