@@ -300,9 +300,17 @@ def create_energy_sankey(energy_data: dict) -> go.Figure:
     Q_fuel          = energy_data.get('Q_fuel', 68.1)
     Q_steam         = energy_data.get('Q_steam', 96.7)
     Q_purge         = energy_data.get('Q_purge', 0.82)
-    Q_flue_sensible = energy_data.get('Q_flue_sensible', 3.0)
-    Q_ash           = energy_data.get('Q_ash', 0.08)
-    Q_radiation     = energy_data.get('Q_radiation', 1.02)
+    Q_flue_sensible = energy_data.get('Q_flue_sensible', 0)
+    Q_ash           = energy_data.get('Q_ash', 0)
+    Q_radiation     = energy_data.get('Q_radiation', 0)
+
+    # Si los campos nuevos son 0 (resultados calculados con versión anterior),
+    # reconstruir la descomposición desde losses para garantizar renderizado.
+    losses = energy_data.get('losses', 0)
+    if Q_flue_sensible <= 0 and losses > 0:
+        Q_ash           = round(losses * 0.02, 4)
+        Q_radiation     = round(losses * 0.25, 4)
+        Q_flue_sensible = round(losses - Q_ash - Q_radiation, 4)
 
     total_in  = Q_fw + Q_fuel
     total_out = Q_steam + Q_purge + Q_flue_sensible + Q_ash + Q_radiation
@@ -362,7 +370,6 @@ def create_energy_sankey(energy_data: dict) -> go.Figure:
     balance_txt = f'✓ Balance: {total_in:.2f} MW' if balance_ok else f'⚠ Entrada {total_in:.2f} ≠ Salida {total_out:.2f} MW'
 
     fig = go.Figure(data=[go.Sankey(
-        arrangement='snap',
         node=dict(
             pad=20,
             thickness=22,

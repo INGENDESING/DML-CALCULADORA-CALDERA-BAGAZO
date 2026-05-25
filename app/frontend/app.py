@@ -283,15 +283,21 @@ def update_tabs_content(active_tab, results):
                          create_results_table(results)])
     elif active_tab == 'tab-sankey':
         return html.Div([html.H4('BALANCE DE ENERGÍA', style={'color': COLORS['text_primary'], 'marginBottom': '16px'}),
-                         dcc.Graph(figure=create_energy_sankey({
-                             'Q_fw': results['Q_fw'],
-                             'Q_fuel': results['Q_fuel'],
-                             'Q_steam': results['Q_steam'],
-                             'Q_purge': results['Q_purge'],
-                             'Q_flue_sensible': results.get('Q_flue_sensible', 0),
-                             'Q_ash': results.get('Q_ash', 0),
-                             'Q_radiation': results.get('Q_radiation', 0),
-                         }), style={'height': '500px'})])
+                         dcc.Graph(
+                             figure=create_energy_sankey({
+                                 'Q_fw': results['Q_fw'],
+                                 'Q_fuel': results['Q_fuel'],
+                                 'Q_steam': results['Q_steam'],
+                                 'Q_purge': results['Q_purge'],
+                                 'Q_flue_sensible': results.get('Q_flue_sensible', 0),
+                                 'Q_ash': results.get('Q_ash', 0),
+                                 'Q_radiation': results.get('Q_radiation', 0),
+                                 'losses': results.get('losses', 0),
+                             }),
+                             responsive=True,
+                             style={'height': '500px', 'width': '100%'},
+                             config={'displayModeBar': False}
+                         )])
     return html.Div()
 
 
