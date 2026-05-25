@@ -17,5 +17,8 @@ iapws>=1.5.0
 # Generación de PDF
 reportlab>=4.2.0
 
+# Servidor WSGI producción
+gunicorn>=21.2.0
+
 # Utilidades
 python-dateutil>=2.9.0
