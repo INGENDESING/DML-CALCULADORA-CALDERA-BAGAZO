@@ -97,6 +97,9 @@ class BalanceResults:
     Q_abs_MW: float        # Calor absorbido [MW]
     Q_fuel_MW: float       # Calor del combustible [MW]
     losses_MW: float       # Pérdidas [MW]
+    Q_ash_MW: float        # Calor sensible en cenizas [MW]
+    Q_radiation_MW: float  # Pérdidas por radiación + convección [MW]
+    Q_flue_sensible_MW: float  # Calor en gases (para Sankey, residual) [MW]
 
     # Propiedades del vapor
     steam_props: dict
@@ -342,6 +345,13 @@ def calculate_complete_balance(inputs: InputData) -> BalanceResults:
     # 7. Cenizas
     m_ash_th = bagazo_data['m_bagazo_th'] * (inputs.bagazo_ash / 100)
 
+    # Pérdidas desglosadas para Sankey (suma garantizada = losses_MW)
+    m_ash_kgh = m_ash_th * 1000
+    Q_ash_MW = round(m_ash_kgh * 0.84 * (T_flue - inputs.T_amb) / 3_600_000, 3)
+    Q_radiation_MW = round(energy_bal['Q_fuel_MW'] * 0.015, 3)
+    losses_total = round(energy_bal['Q_fuel_MW'] - energy_bal['Q_abs_MW'], 2)
+    Q_flue_sensible_MW = round(max(0.0, losses_total - Q_ash_MW - Q_radiation_MW), 3)
+
     # 8. Crear objetos de resultado
 
     # Corrientes de entrada
@@ -426,7 +436,10 @@ def calculate_complete_balance(inputs: InputData) -> BalanceResults:
         ash=ash_stream,
         Q_abs_MW=energy_bal['Q_abs_MW'],
         Q_fuel_MW=energy_bal['Q_fuel_MW'],
-        losses_MW=round(energy_bal['Q_fuel_MW'] - energy_bal['Q_abs_MW'], 2),
+        losses_MW=losses_total,
+        Q_ash_MW=Q_ash_MW,
+        Q_radiation_MW=Q_radiation_MW,
+        Q_flue_sensible_MW=Q_flue_sensible_MW,
         steam_props=steam_props,
         flue_gas_composition=flue_gas_data['composition_wet'],
         inputs=inputs
