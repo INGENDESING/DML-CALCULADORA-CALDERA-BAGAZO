@@ -362,7 +362,6 @@ def create_energy_sankey(energy_data: dict) -> go.Figure:
     balance_txt = f'✓ Balance: {total_in:.2f} MW' if balance_ok else f'⚠ Entrada {total_in:.2f} ≠ Salida {total_out:.2f} MW'
 
     fig = go.Figure(data=[go.Sankey(
-        arrangement='snap',
         node=dict(
             pad=20,
             thickness=22,
