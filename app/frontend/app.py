@@ -259,6 +259,34 @@ def update_secondary_kpis(results):
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# CALLBACK Sankey (siempre visible)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@app.callback(Output('sankey-container', 'children'), [Input('store-results', 'data')])
+def update_sankey_container(results):
+    if not results:
+        return None
+    return html.Div([
+        html.H4('BALANCE DE ENERGÍA', style={'color': COLORS['text_primary'], 'marginBottom': '8px'}),
+        dcc.Graph(
+            figure=create_energy_sankey({
+                'Q_fw': results['Q_fw'],
+                'Q_fuel': results['Q_fuel'],
+                'Q_steam': results['Q_steam'],
+                'Q_purge': results['Q_purge'],
+                'Q_flue_sensible': results.get('Q_flue_sensible', 0),
+                'Q_ash': results.get('Q_ash', 0),
+                'Q_radiation': results.get('Q_radiation', 0),
+                'losses': results.get('losses', 0),
+            }),
+            responsive=True,
+            style={'height': '500px', 'width': '100%'},
+            config={'displayModeBar': False}
+        )
+    ])
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # CALLBACK Tabs Content
 # ═══════════════════════════════════════════════════════════════════════════════
 

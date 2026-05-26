@@ -302,6 +302,9 @@ def create_content_area() -> html.Div:
         html.Div(id='kpi-ratio-container', style={'marginTop': '16px'}),
         html.Div(id='kpi-secondary-container', style={'marginTop': '12px'}),
 
+        # Sankey siempre visible
+        html.Div(id='sankey-container', style={'marginTop': '16px'}),
+
         # Loading overlay
         html.Div(id='loading-overlay', style={
             'position': 'fixed',

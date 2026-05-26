@@ -461,3 +461,28 @@ El PDF se genera con ReportLab. El PFD del browser es HTML/SVG, así que se recr
 - `_create_pfd_drawing(results)` — genera el diagrama PFD como Drawing de ReportLab
 
 **Verificación:** PDF generado exitosamente con datos del caso base (6,365 bytes)
+
+---
+
+## 15. FIX SANKEY + SANKEY EN PDF (2026-05-26)
+
+### Problema
+1. El diagrama Sankey estaba dentro de la pestaña "Balance Energético" (tab-sankey), que requería que el usuario hiciera clic manualmente para verlo. Era invisible por defecto.
+2. El reporte PDF no incluía el diagrama de balance de energía.
+
+### Plan de corrección
+
+- [x] **Tarea 1**: `layout_main.py` — Agregar `html.Div(id='sankey-container')` en el área siempre visible (después de `kpi-secondary-container`)
+- [x] **Tarea 2**: `app.py` — Agregar callback `update_sankey_container` que renderiza el Sankey directamente desde `store-results` (sin necesitar clic en tab)
+- [x] **Tarea 3**: `report_generator.py` — Agregar `_create_sankey_drawing(results)` y llamarla en `generate_pdf_report()` después del PFD
+- [x] **Tarea 4**: Commit y push
+
+### Revisión
+
+**Archivos modificados:**
+1. `app/frontend/layouts/layout_main.py` — `sankey-container` div agregado en área siempre visible
+2. `app/frontend/app.py` — Callback `update_sankey_container` que responde a `store-results`
+3. `app/frontend/components/report_generator.py` — `_create_sankey_drawing()` + sección en PDF
+
+**PDF:** 7,651 bytes (antes: 6,365 bytes) — incluye ahora la sección "BALANCE DE ENERGÍA"
+**Tests:** 66/66 pasando ✓
