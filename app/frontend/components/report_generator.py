@@ -7,22 +7,27 @@ DML INGENIEROS CONSULTORES S.A.S.
 """
 
 import io
+import os
 from datetime import datetime
 from typing import Dict, Optional
 
 # Intentar importar librerías PDF
 try:
-    from reportlab.lib.pagesizes import A4, letter
+    from reportlab.lib.pagesizes import A4, letter, landscape
     from reportlab.lib import colors
     from reportlab.lib.units import cm
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
-    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image, PageBreak
+    from reportlab.platypus import (SimpleDocTemplate, Table, TableStyle,
+                                    Paragraph, Spacer, Image, PageBreak, HRFlowable)
     from reportlab.graphics.shapes import Drawing, Rect, Line, String, Polygon
     from reportlab.graphics import renderPDF
     REPORTLAB_AVAILABLE = True
 except ImportError:
     REPORTLAB_AVAILABLE = False
+
+# Ruta al logo de la empresa
+_LOGO_PATH = os.path.join(os.path.dirname(__file__), '..', 'assets', 'logo1.png')
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -168,7 +173,7 @@ def _create_pfd_drawing(results: Dict) -> Drawing:
 
 def _create_sankey_drawing(results: Dict) -> Drawing:
     """Creates the energy balance bar chart drawing for PDF."""
-    w, h = 500, 160
+    w, h = 750, 160
     d = Drawing(w, h)
 
     Q_fw    = float(results.get('Q_fw', 0) or 0)
@@ -204,11 +209,11 @@ def _create_sankey_drawing(results: Dict) -> Drawing:
         'tot_r':  colors.HexColor('#FFE0CC'),
     }
 
-    col_w   = 242
+    col_w   = 367
     col1    = 2
-    col2    = 256
-    lbl_w   = 108
-    bar_max = 80
+    col2    = 381
+    lbl_w   = 160
+    bar_max = 130
     row_h   = 18
     hdr_h   = 16
     title_y = h - 10
@@ -294,10 +299,14 @@ def generate_pdf_report(results: Dict, inputs: Dict, filename: str = None) -> Op
     # Crear buffer
     buffer = io.BytesIO()
 
+    # Página horizontal A4
+    PAGE_SIZE = landscape(A4)
+    pw = PAGE_SIZE[0] - 3*cm  # ancho útil ≈ 26.7 cm
+
     # Crear documento
     doc = SimpleDocTemplate(
         buffer,
-        pagesize=A4,
+        pagesize=PAGE_SIZE,
         rightMargin=1.5*cm,
         leftMargin=1.5*cm,
         topMargin=1.5*cm,
@@ -310,39 +319,58 @@ def generate_pdf_report(results: Dict, inputs: Dict, filename: str = None) -> Op
     # Estilos
     styles = getSampleStyleSheet()
 
-    title_style = ParagraphStyle(
-        'CustomTitle',
-        parent=styles['Heading1'],
-        fontSize=16,
-        textColor=colors.HexColor('#0078D4'),
-        alignment=TA_CENTER,
-        spaceAfter=0.3*cm
-    )
-
     subtitle_style = ParagraphStyle(
         'CustomSubtitle',
-        parent=styles['Heading2'],
-        fontSize=12,
-        textColor=colors.HexColor('#333333'),
+        parent=styles['Normal'],
+        fontSize=10,
+        textColor=colors.white,
+        backColor=colors.HexColor('#0078D4'),
         alignment=TA_LEFT,
         spaceAfter=0.2*cm,
-        spaceBefore=0.3*cm
+        spaceBefore=0.3*cm,
+        leftIndent=4,
+        borderPad=5,
+        fontName='Helvetica-Bold',
     )
 
     # ==================== ENCABEZADO ====================
-    elements.append(Paragraph("DML INGENIEROS CONSULTORES S.A.S.", ParagraphStyle(
-        'Company', parent=styles['Normal'], fontSize=10, textColor=colors.gray, alignment=TA_CENTER
-    )))
-    elements.append(Spacer(0.3*cm, 0.3*cm))
-    elements.append(Paragraph("CALCULADORA DE CALDERA ACUOTUBULAR", title_style))
-    elements.append(Paragraph("Reporte de Balance de Materia y Energía", ParagraphStyle(
-        'Sub', parent=styles['Normal'], alignment=TA_CENTER, fontSize=10
-    )))
-    elements.append(Spacer(0.2*cm, 0.2*cm))
+    fecha = datetime.now().strftime("%d/%m/%Y  %H:%M")
 
-    fecha = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    elements.append(Paragraph(f"<b>Fecha:</b> {fecha}", styles['Normal']))
+    _has_logo = os.path.exists(_LOGO_PATH)
+    logo_cell = Image(_LOGO_PATH, width=5*cm, height=2*cm, kind='proportional') if _has_logo else ''
+
+    hdr_data = [[
+        logo_cell,
+        Paragraph(
+            'CALCULADORA DE CALDERA ACUOTUBULAR<br/>'
+            '<font size="9" color="#555555">Reporte de Balance de Materia y Energía</font>',
+            ParagraphStyle('HdrTitle', parent=styles['Normal'],
+                           fontSize=14, textColor=colors.HexColor('#0078D4'),
+                           alignment=TA_CENTER, fontName='Helvetica-Bold', leading=18)
+        ),
+        Paragraph(
+            f'<b>Fecha:</b> {fecha}<br/><br/>'
+            f'<font size="8" color="#555555">DML INGENIEROS CONSULTORES S.A.S.</font>',
+            ParagraphStyle('HdrRight', parent=styles['Normal'],
+                           fontSize=9, alignment=TA_RIGHT)
+        ),
+    ]]
+    hdr_table = Table(hdr_data, colWidths=[5.5*cm, pw - 12.5*cm, 7*cm])
+    hdr_table.setStyle(TableStyle([
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('ALIGN', (0, 0), (0, 0), 'LEFT'),
+        ('ALIGN', (2, 0), (2, 0), 'RIGHT'),
+        ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#F0F6FF')),
+        ('BOX', (0, 0), (-1, -1), 2, colors.HexColor('#0078D4')),
+        ('TOPPADDING', (0, 0), (-1, -1), 8),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+        ('LEFTPADDING', (0, 0), (-1, -1), 10),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 10),
+    ]))
+    elements.append(hdr_table)
     elements.append(Spacer(0.3*cm, 0.3*cm))
+    elements.append(HRFlowable(width='100%', thickness=2, color=colors.HexColor('#0078D4'),
+                                spaceAfter=0.3*cm))
 
     # ==================== KPIs ====================
     elements.append(Paragraph("INDICADORES CLAVE (KPIs)", subtitle_style))
@@ -362,7 +390,7 @@ def generate_pdf_report(results: Dict, inputs: Dict, filename: str = None) -> Op
          '', ''],
     ]
 
-    ratio_table = Table(ratio_data, colWidths=[17*cm/3, 17*cm/3, 17*cm/3])
+    ratio_table = Table(ratio_data, colWidths=[pw/3, pw/3, pw/3])
     ratio_table.setStyle(TableStyle([
         ('SPAN', (0, 0), (2, 0)),
         ('SPAN', (0, 1), (2, 1)),
@@ -387,7 +415,7 @@ def generate_pdf_report(results: Dict, inputs: Dict, filename: str = None) -> Op
          f"{_fmt(results.get('Q_abs'))} MW"],
     ]
 
-    kpi_table = Table(kpi_data, colWidths=[4.25*cm]*4)
+    kpi_table = Table(kpi_data, colWidths=[pw/4]*4)
     kpi_table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#252526')),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
@@ -440,7 +468,7 @@ def generate_pdf_report(results: Dict, inputs: Dict, filename: str = None) -> Op
         ["Exceso de aire", f"{inputs.get('excess_air', '-')}", "%"],
     ]
 
-    input_table = Table(input_data, colWidths=[6*cm, 3*cm, 2*cm])
+    input_table = Table(input_data, colWidths=[10*cm, 5*cm, 3.5*cm])
     input_table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#0078D4')),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
@@ -490,7 +518,7 @@ def generate_pdf_report(results: Dict, inputs: Dict, filename: str = None) -> Op
         ["", "TOTAL SALIDA", "", "", f"{_total_out:.2f}"],
     ]
 
-    results_table = Table(results_data, colWidths=[2.5*cm, 5*cm, 3*cm, 2.5*cm, 3*cm])
+    results_table = Table(results_data, colWidths=[3*cm, 9*cm, 5*cm, 4*cm, 4.5*cm])
     results_table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#252526')),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
@@ -534,7 +562,7 @@ def generate_pdf_report(results: Dict, inputs: Dict, filename: str = None) -> Op
         ["  · Radiación y Convección", f"{_q_rad:.3f} MW"],
     ]
 
-    eff_table = Table(eff_data, colWidths=[7*cm, 4*cm])
+    eff_table = Table(eff_data, colWidths=[14*cm, 7*cm])
     eff_table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), eff_color),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
@@ -553,7 +581,7 @@ def generate_pdf_report(results: Dict, inputs: Dict, filename: str = None) -> Op
         ["Generado por Calculadora de Caldera Acuotubular", "DML INGENIEROS CONSULTORES S.A.S."],
     ]
 
-    footer_table = Table(footer_data, colWidths=[10*cm, 6*cm])
+    footer_table = Table(footer_data, colWidths=[pw * 0.6, pw * 0.4])
     footer_table.setStyle(TableStyle([
         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
         ('TEXTCOLOR', (0, 1), (-1, -1), colors.gray),
