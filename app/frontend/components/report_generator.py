@@ -390,7 +390,8 @@ def generate_pdf_report(results: Dict, inputs: Dict, filename: str = None) -> Op
          '', ''],
     ]
 
-    ratio_table = Table(ratio_data, colWidths=[pw/3, pw/3, pw/3])
+    ratio_table = Table(ratio_data, colWidths=[pw/3, pw/3, pw/3],
+                        rowHeights=[0.7*cm, 1.8*cm, 0.6*cm])
     ratio_table.setStyle(TableStyle([
         ('SPAN', (0, 0), (2, 0)),
         ('SPAN', (0, 1), (2, 1)),
@@ -399,8 +400,6 @@ def generate_pdf_report(results: Dict, inputs: Dict, filename: str = None) -> Op
         ('BACKGROUND', (0, 1), (-1, 2), colors.HexColor('#F0F6FC')),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-        ('TOPPADDING', (0, 1), (-1, 1), 8),
-        ('BOTTOMPADDING', (0, 2), (-1, 2), 8),
         ('BOX', (0, 0), (-1, -1), 1, colors.HexColor('#0078D4')),
     ]))
     elements.append(ratio_table)
