@@ -163,6 +163,110 @@ def _create_pfd_drawing(results: Dict) -> Drawing:
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# DIAGRAMA BALANCE DE ENERGÍA PARA PDF
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def _create_sankey_drawing(results: Dict) -> Drawing:
+    """Creates the energy balance bar chart drawing for PDF."""
+    w, h = 500, 160
+    d = Drawing(w, h)
+
+    Q_fw    = float(results.get('Q_fw', 0) or 0)
+    Q_fuel  = float(results.get('Q_fuel', 0) or 0)
+    Q_steam = float(results.get('Q_steam', 0) or 0)
+    Q_purge = float(results.get('Q_purge', 0) or 0)
+    Q_flue_sensible = float(results.get('Q_flue_sensible', 0) or 0)
+    Q_ash   = float(results.get('Q_ash', 0) or 0)
+    Q_radiation = float(results.get('Q_radiation', 0) or 0)
+    losses  = float(results.get('losses', 0) or 0)
+
+    if Q_flue_sensible <= 0 and losses > 0:
+        Q_ash = round(losses * 0.02, 4)
+        Q_radiation = round(losses * 0.25, 4)
+        Q_flue_sensible = round(losses - Q_ash - Q_radiation, 4)
+
+    total_in  = Q_fw + Q_fuel
+    total_out = Q_steam + Q_purge + Q_flue_sensible + Q_ash + Q_radiation
+    max_val   = max(Q_fuel, Q_steam, total_in, total_out, 1.0)
+
+    clr_map = {
+        'Q_fw':   colors.HexColor('#0078D4'),
+        'Q_fuel': colors.HexColor('#FF8C00'),
+        'Q_stm':  colors.HexColor('#107C10'),
+        'Q_pur':  colors.HexColor('#3498DB'),
+        'Q_flu':  colors.HexColor('#7F8C8D'),
+        'Q_ash':  colors.HexColor('#A0522D'),
+        'Q_rad':  colors.HexColor('#E81123'),
+        'hdr':    colors.HexColor('#0078D4'),
+        'dark':   colors.HexColor('#252526'),
+        'alt':    colors.HexColor('#F5F5F5'),
+        'tot_l':  colors.HexColor('#DDEEFF'),
+        'tot_r':  colors.HexColor('#FFE0CC'),
+    }
+
+    col_w   = 242
+    col1    = 2
+    col2    = 256
+    lbl_w   = 108
+    bar_max = 80
+    row_h   = 18
+    hdr_h   = 16
+    title_y = h - 10
+    hdr_y   = title_y - hdr_h
+    row0_y  = hdr_y - row_h
+
+    d.add(String(w / 2, title_y, 'BALANCE DE ENERGÍA (MW)',
+                 fontSize=9, fillColor=clr_map['dark'], textAnchor='middle',
+                 fontName='Helvetica-Bold'))
+
+    def draw_header(cx, label):
+        d.add(Rect(cx, hdr_y, col_w, hdr_h, fillColor=clr_map['hdr'], strokeWidth=0))
+        d.add(String(cx + col_w / 2, hdr_y + 4.5, label,
+                     fontSize=8, fillColor=colors.white, textAnchor='middle',
+                     fontName='Helvetica-Bold'))
+
+    def draw_row(cx, y, name, val, clr, is_total=False, bg=None):
+        if bg:
+            d.add(Rect(cx, y, col_w, row_h - 1, fillColor=bg, strokeWidth=0))
+        font = 'Helvetica-Bold' if is_total else 'Helvetica'
+        d.add(String(cx + 3, y + 4.5, name, fontSize=6.5, fillColor=clr_map['dark'],
+                     textAnchor='start', fontName=font))
+        if not is_total and max_val > 0:
+            bw = max(val / max_val * bar_max, 0.5)
+            d.add(Rect(cx + lbl_w, y + 3, bw, row_h - 7, fillColor=clr, strokeWidth=0))
+        suffix = ' MW' if is_total else ''
+        d.add(String(cx + lbl_w + bar_max + 3, y + 4.5, f'{val:.2f}{suffix}',
+                     fontSize=7, fillColor=clr_map['dark'], textAnchor='start', fontName=font))
+
+    draw_header(col1, 'ENTRADAS')
+    in_rows = [
+        ('Agua Alimentación', Q_fw, clr_map['Q_fw']),
+        ('Bagazo (Combustible)', Q_fuel, clr_map['Q_fuel']),
+    ]
+    for i, (nm, v, c) in enumerate(in_rows):
+        draw_row(col1, row0_y - i * row_h, nm, v, c,
+                 bg=clr_map['alt'] if i % 2 == 0 else None)
+    draw_row(col1, row0_y - len(in_rows) * row_h, 'TOTAL ENTRADA', total_in,
+             None, is_total=True, bg=clr_map['tot_l'])
+
+    draw_header(col2, 'SALIDAS')
+    out_rows = [
+        ('Vapor Sobrecalentado', Q_steam, clr_map['Q_stm']),
+        ('Purga Continua', Q_purge, clr_map['Q_pur']),
+        ('Gases de Combustión', Q_flue_sensible, clr_map['Q_flu']),
+        ('Cenizas', Q_ash, clr_map['Q_ash']),
+        ('Radiación/Convección', Q_radiation, clr_map['Q_rad']),
+    ]
+    for i, (nm, v, c) in enumerate(out_rows):
+        draw_row(col2, row0_y - i * row_h, nm, v, c,
+                 bg=clr_map['alt'] if i % 2 == 0 else None)
+    draw_row(col2, row0_y - len(out_rows) * row_h, 'TOTAL SALIDA', total_out,
+             None, is_total=True, bg=clr_map['tot_r'])
+
+    return d
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # GENERADOR PRINCIPAL
 # ═══════════════════════════════════════════════════════════════════════════════
 
@@ -308,6 +412,13 @@ def generate_pdf_report(results: Dict, inputs: Dict, filename: str = None) -> Op
 
     pfd = _create_pfd_drawing(results)
     elements.append(pfd)
+    elements.append(Spacer(0.3*cm, 0.3*cm))
+
+    # ==================== BALANCE DE ENERGÍA (SANKEY) ====================
+    elements.append(Paragraph("BALANCE DE ENERGÍA", subtitle_style))
+
+    sankey = _create_sankey_drawing(results)
+    elements.append(sankey)
     elements.append(Spacer(0.3*cm, 0.3*cm))
 
     # ==================== DATOS DE ENTRADA ====================
