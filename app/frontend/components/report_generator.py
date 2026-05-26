@@ -377,27 +377,25 @@ def generate_pdf_report(results: Dict, inputs: Dict, filename: str = None) -> Op
 
     ratio = results.get('ratio', 0)
 
-    # KPI principal: Ratio
+    # KPI principal: Ratio (número + subtítulo en una sola celda para evitar superposición)
     ratio_data = [
         [Paragraph('<b>RATIO VAPOR / BAGAZO</b>', ParagraphStyle(
             'r1', parent=styles['Normal'], alignment=TA_CENTER, fontSize=10, textColor=colors.white)),
          '', ''],
-        [Paragraph(f'<b><font size="28">{ratio:.3f}</font></b>', ParagraphStyle(
-            'r2', parent=styles['Normal'], alignment=TA_CENTER, textColor=colors.HexColor('#0078D4'))),
-         '', ''],
-        [Paragraph('t_vapor / t_bagazo', ParagraphStyle(
-            'r3', parent=styles['Normal'], alignment=TA_CENTER, fontSize=9, textColor=colors.gray)),
+        [Paragraph(
+            f'<b><font size="28" color="#0078D4">{ratio:.3f}</font></b><br/>'
+            '<font size="9" color="#888888">t_vapor / t_bagazo</font>',
+            ParagraphStyle('r2', parent=styles['Normal'], alignment=TA_CENTER, leading=36)),
          '', ''],
     ]
 
     ratio_table = Table(ratio_data, colWidths=[pw/3, pw/3, pw/3],
-                        rowHeights=[0.7*cm, 1.8*cm, 0.6*cm])
+                        rowHeights=[0.7*cm, 2.2*cm])
     ratio_table.setStyle(TableStyle([
         ('SPAN', (0, 0), (2, 0)),
         ('SPAN', (0, 1), (2, 1)),
-        ('SPAN', (0, 2), (2, 2)),
         ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#0078D4')),
-        ('BACKGROUND', (0, 1), (-1, 2), colors.HexColor('#F0F6FC')),
+        ('BACKGROUND', (0, 1), (-1, 1), colors.HexColor('#F0F6FC')),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
         ('BOX', (0, 0), (-1, -1), 1, colors.HexColor('#0078D4')),
