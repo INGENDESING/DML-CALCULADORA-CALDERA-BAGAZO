@@ -457,23 +457,37 @@ def generate_pdf_report(results: Dict, inputs: Dict, filename: str = None) -> Op
     # ==================== TABLA DE RESULTADOS ====================
     elements.append(Paragraph("TABLA DE RESULTADOS", subtitle_style))
 
+    # Compute decomposed losses consistent with Sankey
+    _q_flue_s = float(results.get('Q_flue_sensible', 0) or 0)
+    _q_ash_e  = float(results.get('Q_ash', 0) or 0)
+    _q_rad    = float(results.get('Q_radiation', 0) or 0)
+    _losses   = float(results.get('losses', 0) or 0)
+    if _q_flue_s <= 0 and _losses > 0:
+        _q_ash_e  = round(_losses * 0.02, 3)
+        _q_rad    = round(_losses * 0.25, 3)
+        _q_flue_s = round(_losses - _q_ash_e - _q_rad, 3)
+    _total_in  = (results.get('Q_fw', 0) or 0) + (results.get('Q_fuel', 0) or 0)
+    _total_out = (results.get('Q_steam', 0) or 0) + (results.get('Q_purge', 0) or 0) + _q_flue_s + _q_ash_e + _q_rad
+
     results_data = [
         ["Tipo", "Corriente", "Flujo [t/h]", "T [°C]", "Energía [MW]"],
         ["ENTRADA", "Agua de Alimentación",
          _fmt(results.get('m_fw')), _fmt(results.get('T_fw'), 1), _fmt(results.get('Q_fw'))],
-        ["ENTRADA", "Bagazo (AR)",
+        ["ENTRADA", "Bagazo (Combustible)",
          _fmt(results.get('m_bagazo')), _fmt(results.get('T_amb'), 1), _fmt(results.get('Q_fuel'))],
-        ["ENTRADA", "Aire de Combustión",
-         _fmt(results.get('m_air')), _fmt(results.get('T_amb'), 1), "-"],
+        ["", "TOTAL ENTRADA", "", "", f"{_total_in:.2f}"],
         ["", "", "", "", ""],
         ["SALIDA", "Vapor Sobrecalentado",
          _fmt(results.get('m_stm')), _fmt(results.get('T_stm'), 1), _fmt(results.get('Q_steam'))],
         ["SALIDA", "Purga Continua",
          _fmt(results.get('m_purge')), _fmt(results.get('T_purge'), 1), _fmt(results.get('Q_purge'))],
         ["SALIDA", "Gases de Combustión",
-         _fmt(results.get('m_flue')), _fmt(results.get('T_flue'), 1), _fmt(results.get('Q_flue'))],
+         _fmt(results.get('m_flue')), _fmt(results.get('T_flue'), 1), f"{_q_flue_s:.3f}"],
         ["SALIDA", "Cenizas",
-         _fmt(results.get('m_ash')), "-", "-"],
+         _fmt(results.get('m_ash')), "-", f"{_q_ash_e:.3f}"],
+        ["SALIDA", "Radiación y Convección",
+         "-", "-", f"{_q_rad:.3f}"],
+        ["", "TOTAL SALIDA", "", "", f"{_total_out:.2f}"],
     ]
 
     results_table = Table(results_data, colWidths=[2.5*cm, 5*cm, 3*cm, 2.5*cm, 3*cm])
@@ -485,11 +499,17 @@ def generate_pdf_report(results: Dict, inputs: Dict, filename: str = None) -> Op
         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
         ('ALIGN', (2, 1), (-1, -1), 'CENTER'),
         # Entradas - fondo azul claro
-        ('BACKGROUND', (0, 1), (-1, 3), colors.HexColor('#E3F2FD')),
+        ('BACKGROUND', (0, 1), (-1, 2), colors.HexColor('#E3F2FD')),
+        # Total entrada
+        ('BACKGROUND', (0, 3), (-1, 3), colors.HexColor('#BBDEFB')),
+        ('FONTNAME', (0, 3), (-1, 3), 'Helvetica-Bold'),
         # Separador
         ('BACKGROUND', (0, 4), (-1, 4), colors.HexColor('#CCCCCC')),
         # Salidas - fondo naranja claro
-        ('BACKGROUND', (0, 5), (-1, -1), colors.HexColor('#FFF3E0')),
+        ('BACKGROUND', (0, 5), (-1, 9), colors.HexColor('#FFF3E0')),
+        # Total salida
+        ('BACKGROUND', (0, 10), (-1, 10), colors.HexColor('#FFCC80')),
+        ('FONTNAME', (0, 10), (-1, 10), 'Helvetica-Bold'),
         ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#AAAAAA')),
         ('TOPPADDING', (0, 0), (-1, -1), 5),
         ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
@@ -506,9 +526,12 @@ def generate_pdf_report(results: Dict, inputs: Dict, filename: str = None) -> Op
     eff_data = [
         ["Parámetro", "Valor"],
         ["Eficiencia Térmica", f"{eff:.1f} %"],
-        ["Energía Absorbida (Q_abs)", f"{_fmt(results.get('Q_abs'))} MW"],
         ["Energía Combustible (Q_fuel)", f"{_fmt(results.get('Q_fuel'))} MW"],
-        ["Pérdidas", f"{_fmt(results.get('losses'))} MW"],
+        ["Energía Absorbida (Q_abs)", f"{_fmt(results.get('Q_abs'))} MW"],
+        ["Pérdidas Totales", f"{_fmt(results.get('losses'))} MW"],
+        ["  · Gases de Combustión", f"{_q_flue_s:.3f} MW"],
+        ["  · Cenizas (calor sensible)", f"{_q_ash_e:.3f} MW"],
+        ["  · Radiación y Convección", f"{_q_rad:.3f} MW"],
     ]
 
     eff_table = Table(eff_data, colWidths=[7*cm, 4*cm])
